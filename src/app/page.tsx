@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { Fredoka } from "next/font/google";
+
+const fredoka = Fredoka({ subsets: ["latin"], display: "swap", variable: "--font-fredoka" });
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 gap-4">
-      <h1 className="text-4xl font-bold text-slate-900">
-        ViaLumen
+    <main className={`flex min-h-screen flex-col items-center justify-center bg-slate-50 gap-4 ${fredoka.variable}`}>
+      <h1 className={`text-4xl font-semibold text-slate-900 ${fredoka.className}`}>
+        VIALUMEN
       </h1>
       <p className="text-slate-600 max-w-lg text-center">
         The beginning of a journey.
