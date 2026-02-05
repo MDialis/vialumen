@@ -16,6 +16,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Fredoka } from "next/font/google";
+import Link from "next/link";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -56,114 +57,170 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl m-5 rounded-4xl gap-1 md:gap-2">
-        <Card className="relative mx-auto w-full max-w-md pt-0 border-2 border-b-6 border-border rounded-4xl overflow-hidden">
+      <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl m-5 rounded-4xl gap-2 md:gap-4">
+        <Card
+          className="
+            relative mx-auto w-full max-w-md
+            pt-0 rounded-4xl overflow-hidden
+            border-2 border-b-6 border-chart-1/25
+            bg-chart-1/10 hover:brightness-105 hover:scale-105 transition
+        "
+        >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
           <img
             src="https://avatar.vercel.sh/shadcn1"
             alt="Event cover"
             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
           />
+
           <CardHeader>
             <CardAction>
-              <Badge variant="secondary">Featured</Badge>
+              <Badge variant="ghost">Featured</Badge>
             </CardAction>
-            <CardTitle>Design systems meetup</CardTitle>
+            <CardTitle>Physiology</CardTitle>
             <CardDescription className="hidden md:block">
-              A practical talk on component APIs, accessibility, and shipping
-              faster.
+              The essentials for survival: air, water, food, and shelter. The
+              foundation upon which all other growth is built.
             </CardDescription>
           </CardHeader>
+
           <CardFooter>
-            <Button className="w-full">View Event</Button>
+            <Link href="/core" className="w-full">
+              <Button className="w-full">Learn more</Button>
+            </Link>
           </CardFooter>
         </Card>
 
-        <Card className="relative mx-auto w-full max-w-md pt-0 border-2 border-b-6 border-border rounded-4xl overflow-hidden">
+        <Card
+          className="
+            relative mx-auto w-full max-w-md
+            pt-0 rounded-4xl overflow-hidden
+            border-2 border-b-6 border-chart-2/25
+            bg-chart-2/10 hover:brightness-105 hover:scale-105 transition
+        "
+        >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
           <img
             src="https://avatar.vercel.sh/shadcn1"
             alt="Event cover"
             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
           />
+
           <CardHeader>
             <CardAction>
-              <Badge variant="secondary">Featured</Badge>
+              <Badge variant="ghost">Featured</Badge>
             </CardAction>
-            <CardTitle>Design systems meetup</CardTitle>
+            <CardTitle>Safety</CardTitle>
             <CardDescription className="hidden md:block">
-              A practical talk on component APIs, accessibility, and shipping
-              faster.
+              Finding stability in a chaotic world. Securing your health,
+              finances, and environment to build a worry-free future.
             </CardDescription>
           </CardHeader>
+
           <CardFooter>
-            <Button className="w-full">View Event</Button>
+            <Link href="/core" className="w-full">
+              <Button className="w-full">Learn more</Button>
+            </Link>
           </CardFooter>
         </Card>
 
-        <Card className="relative mx-auto w-full max-w-md pt-0 border-2 border-b-6 border-border rounded-4xl overflow-hidden">
+        <Card
+          className="
+            relative mx-auto w-full max-w-md
+            pt-0 rounded-4xl overflow-hidden
+            border-2 border-b-6 border-chart-3/25
+            bg-chart-3/10 hover:brightness-105 hover:scale-105 transition
+        "
+        >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
           <img
             src="https://avatar.vercel.sh/shadcn1"
             alt="Event cover"
             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
           />
+
           <CardHeader>
             <CardAction>
-              <Badge variant="secondary">Featured</Badge>
+              <Badge variant="ghost">Featured</Badge>
             </CardAction>
-            <CardTitle>Design systems meetup</CardTitle>
+            <CardTitle>Belonging</CardTitle>
             <CardDescription className="hidden md:block">
-              A practical talk on component APIs, accessibility, and shipping
-              faster.
+              Connecting with the world around you. Cultivating deep
+              relationships, community roots, and the power of shared
+              experiences.
             </CardDescription>
           </CardHeader>
+
           <CardFooter>
-            <Button className="w-full">View Event</Button>
+            <Link href="/core" className="w-full">
+              <Button className="w-full">Learn more</Button>
+            </Link>
           </CardFooter>
         </Card>
 
-        <Card className="relative mx-auto w-full max-w-md pt-0 border-2 border-b-6 border-border rounded-4xl overflow-hidden">
+        <Card
+          className="
+            relative mx-auto w-full max-w-md
+            pt-0 rounded-4xl overflow-hidden
+            border-2 border-b-6 border-chart-4/25
+            bg-chart-4/10 hover:brightness-105 hover:scale-105 transition
+        "
+        >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
           <img
             src="https://avatar.vercel.sh/shadcn1"
             alt="Event cover"
             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
           />
+
           <CardHeader>
             <CardAction>
-              <Badge variant="secondary">Featured</Badge>
+              <Badge variant="ghost">Featured</Badge>
             </CardAction>
-            <CardTitle>Design systems meetup</CardTitle>
+            <CardTitle>Esteem</CardTitle>
             <CardDescription className="hidden md:block">
-              A practical talk on component APIs, accessibility, and shipping
-              faster.
+              Building confidence and gaining respect. Recognizing your inner
+              worth and achieving the mastery you deserve.
             </CardDescription>
           </CardHeader>
+
           <CardFooter>
-            <Button className="w-full">View Event</Button>
+            <Link href="/core" className="w-full">
+              <Button className="w-full">Learn more</Button>
+            </Link>
           </CardFooter>
         </Card>
 
-        <Card className="relative mx-auto w-full max-w-md pt-0 border-2 border-b-6 border-border rounded-4xl overflow-hidden">
+        <Card
+          className="
+            relative mx-auto w-full max-w-md
+            pt-0 rounded-4xl overflow-hidden
+            border-2 border-b-6 border-chart-5/25
+            bg-chart-5/10 hover:brightness-105 hover:scale-105 transition
+        "
+        >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
           <img
             src="https://avatar.vercel.sh/shadcn1"
             alt="Event cover"
             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
           />
+
           <CardHeader>
             <CardAction>
-              <Badge variant="secondary">Featured</Badge>
+              <Badge variant="ghost">Featured</Badge>
             </CardAction>
-            <CardTitle>Design systems meetup</CardTitle>
+            <CardTitle>Self-Actualization</CardTitle>
             <CardDescription className="hidden md:block">
-              A practical talk on component APIs, accessibility, and shipping
-              faster.
+              The peak of the journey. Realizing your full potential, pursuing
+              creative growth, and becoming the best version of yourself.
             </CardDescription>
           </CardHeader>
+
           <CardFooter>
-            <Button className="w-full">View Event</Button>
+            <Link href="/core" className="w-full">
+              <Button className="w-full">Learn more</Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>
