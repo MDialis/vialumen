@@ -62,8 +62,9 @@ export default function Home() {
           className="
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-chart-1/25
-            bg-chart-1/10 hover:brightness-105 hover:scale-105 transition
+            border-2 border-b-6 border-border
+            bg-card hover:brightness-105 hover:scale-105 
+            transition physiology-theme
         "
         >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -95,8 +96,9 @@ export default function Home() {
           className="
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-chart-2/25
-            bg-chart-2/10 hover:brightness-105 hover:scale-105 transition
+            border-2 border-b-6 border-border
+            bg-card hover:brightness-105 hover:scale-105 
+            transition safety-theme
         "
         >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -128,8 +130,9 @@ export default function Home() {
           className="
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-chart-3/25
-            bg-chart-3/10 hover:brightness-105 hover:scale-105 transition
+            border-2 border-b-6 border-border
+            bg-card hover:brightness-105 hover:scale-105 
+            transition belonging-theme
         "
         >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -162,8 +165,9 @@ export default function Home() {
           className="
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-chart-4/25
-            bg-chart-4/10 hover:brightness-105 hover:scale-105 transition
+            border-2 border-b-6 border-border
+            bg-card hover:brightness-105 hover:scale-105 
+            transition esteem-theme
         "
         >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -195,8 +199,9 @@ export default function Home() {
           className="
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-chart-5/25
-            bg-chart-5/10 hover:brightness-105 hover:scale-105 transition
+            border-2 border-b-6 border-border
+            bg-card hover:brightness-105 hover:scale-105 
+            transition actualization-theme
         "
         >
           <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
