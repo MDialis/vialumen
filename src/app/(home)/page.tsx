@@ -24,6 +24,49 @@ const fredoka = Fredoka({
   variable: "--font-fredoka",
 });
 
+const HIERARCHY_LEVELS = [
+  {
+    title: "Physiology",
+    description:
+      "The essentials for survival: air, water, food, and shelter. The foundation upon which all other growth is built.",
+    theme: "physiology-theme",
+    href: "/core",
+    image: "https://avatar.vercel.sh/shadcn1",
+  },
+  {
+    title: "Safety",
+    description:
+      "Finding stability in a chaotic world. Securing your health, finances, and environment to build a worry-free future.",
+    theme: "safety-theme",
+    href: "/core",
+    image: "https://avatar.vercel.sh/shadcn1",
+  },
+  {
+    title: "Belonging",
+    description:
+      "Connecting with the world around you. Cultivating deep relationships, community roots, and the power of shared experiences.",
+    theme: "belonging-theme",
+    href: "/core",
+    image: "https://avatar.vercel.sh/shadcn1",
+  },
+  {
+    title: "Esteem",
+    description:
+      "Building confidence and gaining respect. Recognizing your inner worth and achieving the mastery you deserve.",
+    theme: "esteem-theme",
+    href: "/core",
+    image: "https://avatar.vercel.sh/shadcn1",
+  },
+  {
+    title: "Self-Actualization",
+    description:
+      "The peak of the journey. Realizing your full potential, pursuing creative growth, and becoming the best version of yourself.",
+    theme: "actualization-theme",
+    href: "/core",
+    image: "https://avatar.vercel.sh/shadcn1",
+  },
+];
+
 export default function Home() {
   return (
     <main
@@ -58,176 +101,42 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl m-5 rounded-4xl gap-2 md:gap-4">
-        <Card
-          className="
+        {HIERARCHY_LEVELS.map((level) => (
+          <Card
+            key={level.title}
+            className={`
             relative mx-auto w-full max-w-md
             pt-0 rounded-4xl overflow-hidden
             border-2 border-b-6 border-border
             bg-card hover:brightness-105 hover:scale-105 
-            transition physiology-theme
-        "
-        >
-          <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-          <img
-            src="https://avatar.vercel.sh/shadcn1"
-            alt="Event cover"
-            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-          />
+            transition ${level.theme}
+            flex flex-col h-full
+            `}
+          >
+            <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+            <img
+              src={level.image}
+              alt={`${level.title} cover`}
+              className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+            />
 
-          <CardHeader>
-            <CardAction>
-              <Badge variant="ghost">Featured</Badge>
-            </CardAction>
-            <CardTitle>Physiology</CardTitle>
-            <CardDescription className="hidden md:block">
-              The essentials for survival: air, water, food, and shelter. The
-              foundation upon which all other growth is built.
-            </CardDescription>
-          </CardHeader>
+            <CardHeader>
+              <CardAction>
+                <Badge variant="ghost">Featured</Badge>
+              </CardAction>
+              <CardTitle>{level.title}</CardTitle>
+              <CardDescription className="hidden md:block">
+                {level.description}
+              </CardDescription>
+            </CardHeader>
 
-          <CardFooter>
-            <Link href="/core" className="w-full">
-              <Button className="w-full">Learn more</Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <Card
-          className="
-            relative mx-auto w-full max-w-md
-            pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-border
-            bg-card hover:brightness-105 hover:scale-105 
-            transition safety-theme
-        "
-        >
-          <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-          <img
-            src="https://avatar.vercel.sh/shadcn1"
-            alt="Event cover"
-            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-          />
-
-          <CardHeader>
-            <CardAction>
-              <Badge variant="ghost">Featured</Badge>
-            </CardAction>
-            <CardTitle>Safety</CardTitle>
-            <CardDescription className="hidden md:block">
-              Finding stability in a chaotic world. Securing your health,
-              finances, and environment to build a worry-free future.
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter>
-            <Link href="/core" className="w-full">
-              <Button className="w-full">Learn more</Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <Card
-          className="
-            relative mx-auto w-full max-w-md
-            pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-border
-            bg-card hover:brightness-105 hover:scale-105 
-            transition belonging-theme
-        "
-        >
-          <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-          <img
-            src="https://avatar.vercel.sh/shadcn1"
-            alt="Event cover"
-            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-          />
-
-          <CardHeader>
-            <CardAction>
-              <Badge variant="ghost">Featured</Badge>
-            </CardAction>
-            <CardTitle>Belonging</CardTitle>
-            <CardDescription className="hidden md:block">
-              Connecting with the world around you. Cultivating deep
-              relationships, community roots, and the power of shared
-              experiences.
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter>
-            <Link href="/core" className="w-full">
-              <Button className="w-full">Learn more</Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <Card
-          className="
-            relative mx-auto w-full max-w-md
-            pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-border
-            bg-card hover:brightness-105 hover:scale-105 
-            transition esteem-theme
-        "
-        >
-          <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-          <img
-            src="https://avatar.vercel.sh/shadcn1"
-            alt="Event cover"
-            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-          />
-
-          <CardHeader>
-            <CardAction>
-              <Badge variant="ghost">Featured</Badge>
-            </CardAction>
-            <CardTitle>Esteem</CardTitle>
-            <CardDescription className="hidden md:block">
-              Building confidence and gaining respect. Recognizing your inner
-              worth and achieving the mastery you deserve.
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter>
-            <Link href="/core" className="w-full">
-              <Button className="w-full">Learn more</Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <Card
-          className="
-            relative mx-auto w-full max-w-md
-            pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-border
-            bg-card hover:brightness-105 hover:scale-105 
-            transition actualization-theme
-        "
-        >
-          <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-          <img
-            src="https://avatar.vercel.sh/shadcn1"
-            alt="Event cover"
-            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-          />
-
-          <CardHeader>
-            <CardAction>
-              <Badge variant="ghost">Featured</Badge>
-            </CardAction>
-            <CardTitle>Self-Actualization</CardTitle>
-            <CardDescription className="hidden md:block">
-              The peak of the journey. Realizing your full potential, pursuing
-              creative growth, and becoming the best version of yourself.
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter>
-            <Link href="/core" className="w-full">
-              <Button className="w-full">Learn more</Button>
-            </Link>
-          </CardFooter>
-        </Card>
+            <CardFooter className="mt-auto">
+              <Link href={level.href} className="w-full">
+                <Button className="w-full">Learn more</Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </main>
   );

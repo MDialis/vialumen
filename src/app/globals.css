@@ -174,7 +174,7 @@
   --shadow-2xl: 0 5px 5px 1px hsl(0 0% 0% / 0.75);
 }
 
-.physiological-theme {
+.physiology-theme {
   --background: oklch(0.9421 0.0147 44.1765);
   --foreground: oklch(0.2138 0.0019 286.2347);
   --card: oklch(0.9306 0.0164 46.5654);
@@ -209,7 +209,7 @@
   --sidebar-ring: oklch(0.7090 0 0);
 }
 
-.dark .physiological-theme {
+.dark .physiology-theme {
   --background: oklch(0.2560 0.0064 34.2981);
   --foreground: oklch(0.9851 0 0);
   --card: oklch(0.2229 0.0088 43.0787);
