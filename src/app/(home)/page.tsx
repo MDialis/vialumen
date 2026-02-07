@@ -106,9 +106,8 @@ export default function Home() {
             key={level.title}
             className={`
             relative mx-auto w-full max-w-md
-            pt-0 rounded-4xl overflow-hidden
-            border-2 border-b-6 border-border
-            bg-card hover:brightness-105 hover:scale-105 
+            pt-0 overflow-hidden
+            hover:brightness-105 hover:scale-105 
             transition ${level.theme}
             flex flex-col h-full
             `}
