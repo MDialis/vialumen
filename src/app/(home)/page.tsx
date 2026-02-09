@@ -26,43 +26,48 @@ const fredoka = Fredoka({
 
 const HIERARCHY_LEVELS = [
   {
+    id: "physiology",
     title: "Physiology",
     description:
       "The essentials for survival: air, water, food, and shelter. The foundation upon which all other growth is built.",
     theme: "physiology-theme",
-    href: "/core",
+    href: "/core?tab=physiology",
     image: "https://avatar.vercel.sh/shadcn1",
   },
   {
+    id: "safety",
     title: "Safety",
     description:
       "Finding stability in a chaotic world. Securing your health, finances, and environment to build a worry-free future.",
     theme: "safety-theme",
-    href: "/core",
+    href: "/core?tab=safety",
     image: "https://avatar.vercel.sh/shadcn1",
   },
   {
+    id: "belonging",
     title: "Belonging",
     description:
       "Connecting with the world around you. Cultivating deep relationships, community roots, and the power of shared experiences.",
     theme: "belonging-theme",
-    href: "/core",
+    href: "/core?tab=belonging",
     image: "https://avatar.vercel.sh/shadcn1",
   },
   {
+    id: "esteem",
     title: "Esteem",
     description:
       "Building confidence and gaining respect. Recognizing your inner worth and achieving the mastery you deserve.",
     theme: "esteem-theme",
-    href: "/core",
+    href: "/core?tab=esteem",
     image: "https://avatar.vercel.sh/shadcn1",
   },
   {
+    id: "actualization",
     title: "Self-Actualization",
     description:
       "The peak of the journey. Realizing your full potential, pursuing creative growth, and becoming the best version of yourself.",
     theme: "actualization-theme",
-    href: "/core",
+    href: "/core?tab=actualization",
     image: "https://avatar.vercel.sh/shadcn1",
   },
 ];
