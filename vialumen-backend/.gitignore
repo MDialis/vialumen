@@ -1,0 +1,16 @@
+# Compiled binaries
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Environment variables
+.env
+.env.*
+
+# Dependency directories (if you ever use vendor)
+/vendor/
