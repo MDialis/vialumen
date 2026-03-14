@@ -24,55 +24,18 @@ const fredoka = Fredoka({
   variable: "--font-fredoka",
 });
 
-const HIERARCHY_LEVELS = [
-  {
-    id: "physiology",
-    title: "Physiology",
-    description:
-      "The essentials for survival: air, water, food, and shelter. The foundation upon which all other growth is built.",
-    theme: "physiology-theme",
-    href: "/core?tab=physiology",
-    image: "https://avatar.vercel.sh/shadcn1",
-  },
-  {
-    id: "safety",
-    title: "Safety",
-    description:
-      "Finding stability in a chaotic world. Securing your health, finances, and environment to build a worry-free future.",
-    theme: "safety-theme",
-    href: "/core?tab=safety",
-    image: "https://avatar.vercel.sh/shadcn1",
-  },
-  {
-    id: "belonging",
-    title: "Belonging",
-    description:
-      "Connecting with the world around you. Cultivating deep relationships, community roots, and the power of shared experiences.",
-    theme: "belonging-theme",
-    href: "/core?tab=belonging",
-    image: "https://avatar.vercel.sh/shadcn1",
-  },
-  {
-    id: "esteem",
-    title: "Esteem",
-    description:
-      "Building confidence and gaining respect. Recognizing your inner worth and achieving the mastery you deserve.",
-    theme: "esteem-theme",
-    href: "/core?tab=esteem",
-    image: "https://avatar.vercel.sh/shadcn1",
-  },
-  {
-    id: "actualization",
-    title: "Self-Actualization",
-    description:
-      "The peak of the journey. Realizing your full potential, pursuing creative growth, and becoming the best version of yourself.",
-    theme: "actualization-theme",
-    href: "/core?tab=actualization",
-    image: "https://avatar.vercel.sh/shadcn1",
-  },
-];
+interface HierarchyLevel {
+  title: string;
+  theme: string;
+  image: string;
+  description: string;
+  href: string;
+}
 
-export default function Home() {
+export default async function Home() {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API}/hierarchy`);
+  const hierarchyLevels: HierarchyLevel[] = await response.json();
+
   return (
     <main
       className={`flex min-h-screen flex-col items-center justify-start bg-background text-foreground pt-32 px-1 gap-4 ${fredoka.variable}`}
@@ -106,7 +69,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl m-5 rounded-4xl gap-2 md:gap-4">
-        {HIERARCHY_LEVELS.map((level) => (
+        {hierarchyLevels.map((level: HierarchyLevel) => (
           <Card
             key={level.title}
             className={`
