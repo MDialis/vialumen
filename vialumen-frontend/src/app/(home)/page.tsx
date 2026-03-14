@@ -1,6 +1,10 @@
+import { getHierarchyLevels } from "@/lib/api";
+import { HierarchyLevel } from "@/types";
+
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardAction,
@@ -15,6 +19,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+
 import { Fredoka } from "next/font/google";
 import Link from "next/link";
 
@@ -24,17 +29,8 @@ const fredoka = Fredoka({
   variable: "--font-fredoka",
 });
 
-interface HierarchyLevel {
-  title: string;
-  theme: string;
-  image: string;
-  description: string;
-  href: string;
-}
-
 export default async function Home() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API}/hierarchy`);
-  const hierarchyLevels: HierarchyLevel[] = await response.json();
+  const hierarchyLevels = await getHierarchyLevels();
 
   return (
     <main
@@ -68,42 +64,51 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl m-5 rounded-4xl gap-2 md:gap-4">
-        {hierarchyLevels.map((level: HierarchyLevel) => (
-          <Card
-            key={level.title}
-            className={`
+      <div className="grid grid-cols-2 md:grid-cols-3 w-full max-w-6xl mx-5 rounded-4xl gap-2 md:gap-4">
+        {!hierarchyLevels || hierarchyLevels.length === 0 ? (
+          <div className="col-span-full text-center text-muted-foreground">
+            <p>
+              We couldn't load the content summary right now. Please try again
+              later.
+            </p>
+          </div>
+        ) : (
+          hierarchyLevels.map((level: HierarchyLevel) => (
+            <Card
+              key={level.title}
+              className={`
             relative mx-auto w-full max-w-md
             pt-0 overflow-hidden
             hover:brightness-105 hover:scale-105 
             transition ${level.theme}
             flex flex-col h-full
             `}
-          >
-            <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-            <img
-              src={level.image}
-              alt={`${level.title} cover`}
-              className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-            />
+            >
+              <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+              <img
+                src={level.image}
+                alt={`${level.title} cover`}
+                className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+              />
 
-            <CardHeader>
-              <CardAction>
-                <Badge variant="ghost">Featured</Badge>
-              </CardAction>
-              <CardTitle>{level.title}</CardTitle>
-              <CardDescription className="hidden md:block">
-                {level.description}
-              </CardDescription>
-            </CardHeader>
+              <CardHeader>
+                <CardAction>
+                  <Badge variant="ghost">Featured</Badge>
+                </CardAction>
+                <CardTitle>{level.title}</CardTitle>
+                <CardDescription className="hidden md:block">
+                  {level.description}
+                </CardDescription>
+              </CardHeader>
 
-            <CardFooter className="mt-auto">
-              <Link href={level.href} className="w-full">
-                <Button className="w-full">Learn more</Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
+              <CardFooter className="mt-auto">
+                <Link href={level.href} className="w-full">
+                  <Button className="w-full">Learn more</Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          ))
+        )}
       </div>
     </main>
   );
