@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 )
 
 type CreateSubthemeRequest struct {
@@ -11,6 +12,45 @@ type CreateSubthemeRequest struct {
 	Slug         string   `json:"slug"`
 	Description  string   `json:"description"`
 	HierarchyIDs []string `json:"hierarchy_ids"`
+}
+
+type SubthemeResponse struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Slug        string    `json:"slug"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, error) {
+	query := `
+		SELECT s.id, s.title, s.slug, s.description, s.created_at
+		FROM subthemes s
+		JOIN subtheme_hierarchies sh ON s.id = sh.subtheme_id
+		WHERE sh.hierarchy_id = $1
+		ORDER BY s.title ASC
+	`
+	rows, err := h.DB.Query(query, hierarchyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	subthemes := []SubthemeResponse{}
+
+	for rows.Next() {
+		var st SubthemeResponse
+		if err := rows.Scan(&st.ID, &st.Title, &st.Slug, &st.Description, &st.CreatedAt); err != nil {
+			return nil, err
+		}
+		subthemes = append(subthemes, st)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return subthemes, nil
 }
 
 func (h *Handler) CreateSubtheme(w http.ResponseWriter, r *http.Request) {
@@ -72,4 +112,23 @@ func (h *Handler) CreateSubtheme(w http.ResponseWriter, r *http.Request) {
 		"message":     "Subtheme created successfully",
 		"subtheme_id": subthemeID,
 	})
+}
+
+func (h *Handler) GetSubthemesByHierarchy(w http.ResponseWriter, r *http.Request) {
+	hierarchyID := r.PathValue("id")
+	if hierarchyID == "" {
+		http.Error(w, "Hierarchy ID is required", http.StatusBadRequest)
+		return
+	}
+
+	subthemes, err := h.fetchSubthemesHelper(hierarchyID)
+	if err != nil {
+		log.Printf("Error fetching subthemes: %v", err)
+		http.Error(w, "Failed to fetch subthemes", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(subthemes)
 }

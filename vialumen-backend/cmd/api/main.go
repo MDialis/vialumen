@@ -41,6 +41,7 @@ func main() {
 
 	mux.HandleFunc("GET /api/health", handlers.HealthCheck)
 	mux.HandleFunc("GET /api/hierarchy", appHandler.GetHierarchyLevels)
+	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
 	mux.HandleFunc("POST /api/subthemes", appHandler.CreateSubtheme)
 
 	handler := enableCORS(mux)
