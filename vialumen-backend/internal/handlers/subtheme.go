@@ -22,6 +22,16 @@ type SubthemeResponse struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type Connection struct {
+	Source int `json:"source"`
+	Target int `json:"target"`
+}
+
+type HierarchyConnectionsResponse struct {
+	Nodes []SubthemeResponse `json:"nodes"`
+	Edges []Connection       `json:"edges"`
+}
+
 func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, error) {
 	query := `
 		SELECT s.id, s.title, s.slug, s.description, s.created_at
@@ -131,4 +141,58 @@ func (h *Handler) GetSubthemesByHierarchy(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(subthemes)
+}
+
+func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *http.Request) {
+	hierarchyID := r.PathValue("id")
+	if hierarchyID == "" {
+		http.Error(w, "Hierarchy ID is required", http.StatusBadRequest)
+		return
+	}
+
+	nodes, err := h.fetchSubthemesHelper(hierarchyID)
+	if err != nil {
+		log.Printf("Error fetching nodes: %v", err)
+		http.Error(w, "Failed to fetch subthemes", http.StatusInternalServerError)
+		return
+	}
+
+	edgesQuery := `
+		SELECT sc.source_subtheme_id, sc.target_subtheme_id
+		FROM subtheme_connections sc
+		JOIN subtheme_hierarchies sh ON sc.source_subtheme_id = sh.subtheme_id
+		WHERE sh.hierarchy_id = $1
+	`
+	edgeRows, err := h.DB.Query(edgesQuery, hierarchyID)
+	if err != nil {
+		log.Printf("Error querying connections: %v", err)
+		http.Error(w, "Failed to fetch connections", http.StatusInternalServerError)
+		return
+	}
+	defer edgeRows.Close()
+
+	edges := []Connection{}
+	for edgeRows.Next() {
+		var conn Connection
+		if err := edgeRows.Scan(&conn.Source, &conn.Target); err != nil {
+			log.Printf("Error scanning connection row: %v", err)
+			http.Error(w, "Failed to read data", http.StatusInternalServerError)
+			return
+		}
+		edges = append(edges, conn)
+	}
+	if err = edgeRows.Err(); err != nil {
+		log.Printf("Error iterating connection rows: %v", err)
+		http.Error(w, "Error processing data", http.StatusInternalServerError)
+		return
+	}
+
+	response := HierarchyConnectionsResponse{
+		Nodes: nodes,
+		Edges: edges,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
