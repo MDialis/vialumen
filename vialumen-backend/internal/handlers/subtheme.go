@@ -32,6 +32,11 @@ type HierarchyConnectionsResponse struct {
 	Edges []Connection       `json:"edges"`
 }
 
+type ConnectSubthemesRequest struct {
+	SourceID int `json:"source_id"`
+	TargetID int `json:"target_id"`
+}
+
 func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, error) {
 	query := `
 		SELECT s.id, s.title, s.slug, s.description, s.created_at
@@ -195,4 +200,40 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
+}
+
+func (h *Handler) ConnectSubthemes(w http.ResponseWriter, r *http.Request) {
+	var req ConnectSubthemesRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	if req.SourceID == 0 || req.TargetID == 0 {
+		http.Error(w, "Both source_id and target_id are required", http.StatusBadRequest)
+		return
+	}
+
+	if req.SourceID == req.TargetID {
+		http.Error(w, "A subtheme cannot connect to itself", http.StatusBadRequest)
+		return
+	}
+
+	_, err := h.DB.Exec(`
+		INSERT INTO subtheme_connections (source_subtheme_id, target_subtheme_id) 
+		VALUES ($1, $2)`,
+		req.SourceID, req.TargetID,
+	)
+
+	if err != nil {
+		log.Printf("Error connecting subthemes %d and %d: %v", req.SourceID, req.TargetID, err)
+		http.Error(w, "Failed to connect subthemes. They might already be connected, or the IDs do not exist.", http.StatusConflict)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Subthemes connected successfully",
+	})
 }
