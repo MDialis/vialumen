@@ -4,16 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-)
 
-type HierarchyLevel struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Theme       string `json:"theme"`
-	Href        string `json:"href"`
-	Image       string `json:"image"`
-}
+	"github.com/MDialis/vialumen-backend/internal/types"
+)
 
 func (h *Handler) GetHierarchyLevels(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.DB.Query("SELECT id, title, description FROM hierarchies")
@@ -24,10 +17,10 @@ func (h *Handler) GetHierarchyLevels(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var levels []HierarchyLevel
+	var levels []types.HierarchyLevel
 
 	for rows.Next() {
-		var level HierarchyLevel
+		var level types.HierarchyLevel
 
 		if err := rows.Scan(&level.ID, &level.Title, &level.Description); err != nil {
 			log.Printf("Error scanning hierarchy row: %v", err)
@@ -52,7 +45,7 @@ func (h *Handler) GetHierarchyLevels(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if levels == nil {
-		levels = []HierarchyLevel{}
+		levels = []types.HierarchyLevel{}
 	}
 
 	json.NewEncoder(w).Encode(levels)

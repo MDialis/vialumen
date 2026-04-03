@@ -4,40 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
+
+	"github.com/MDialis/vialumen-backend/internal/types"
 )
 
-type CreateSubthemeRequest struct {
-	Title        string   `json:"title"`
-	Slug         string   `json:"slug"`
-	Description  string   `json:"description"`
-	HierarchyIDs []string `json:"hierarchy_ids"`
-}
-
-type SubthemeResponse struct {
-	ID          int       `json:"id"`
-	Title       string    `json:"title"`
-	Slug        string    `json:"slug"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-type Connection struct {
-	Source int `json:"source"`
-	Target int `json:"target"`
-}
-
-type HierarchyConnectionsResponse struct {
-	Nodes []SubthemeResponse `json:"nodes"`
-	Edges []Connection       `json:"edges"`
-}
-
-type ConnectSubthemesRequest struct {
-	SourceID int `json:"source_id"`
-	TargetID int `json:"target_id"`
-}
-
-func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, error) {
+func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]types.SubthemeResponse, error) {
 	query := `
 		SELECT s.id, s.title, s.slug, s.description, s.created_at
 		FROM subthemes s
@@ -51,10 +22,10 @@ func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, 
 	}
 	defer rows.Close()
 
-	subthemes := []SubthemeResponse{}
+	subthemes := []types.SubthemeResponse{}
 
 	for rows.Next() {
-		var st SubthemeResponse
+		var st types.SubthemeResponse
 		if err := rows.Scan(&st.ID, &st.Title, &st.Slug, &st.Description, &st.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -69,7 +40,7 @@ func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]SubthemeResponse, 
 }
 
 func (h *Handler) CreateSubtheme(w http.ResponseWriter, r *http.Request) {
-	var req CreateSubthemeRequest
+	var req types.CreateSubthemeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
@@ -176,9 +147,9 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 	}
 	defer edgeRows.Close()
 
-	edges := []Connection{}
+	edges := []types.Connection{}
 	for edgeRows.Next() {
-		var conn Connection
+		var conn types.Connection
 		if err := edgeRows.Scan(&conn.Source, &conn.Target); err != nil {
 			log.Printf("Error scanning connection row: %v", err)
 			http.Error(w, "Failed to read data", http.StatusInternalServerError)
@@ -192,7 +163,7 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 		return
 	}
 
-	response := HierarchyConnectionsResponse{
+	response := types.HierarchyGraphResponse{
 		Nodes: nodes,
 		Edges: edges,
 	}
@@ -203,7 +174,7 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 }
 
 func (h *Handler) ConnectSubthemes(w http.ResponseWriter, r *http.Request) {
-	var req ConnectSubthemesRequest
+	var req types.ConnectSubthemesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
