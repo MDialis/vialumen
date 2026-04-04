@@ -63,7 +63,7 @@ export function GraphDataView({ hierarchyId }: { hierarchyId: string }) {
 
       {/* The Force Graph Container */}
       <div className="flex-1 rounded-xl overflow-hidden border-2 border-border shadow-inner">
-        <Graph data={graphData} />
+        <Graph data={graphData} hierarchyId={hierarchyId} />
       </div>
     </div>
   );

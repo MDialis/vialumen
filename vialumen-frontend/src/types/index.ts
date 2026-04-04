@@ -5,7 +5,7 @@ export interface User {
 }
 
 export interface HierarchyLevel {
-  id: string; // Added this! The backend sends it (e.g., "physiology")
+  id: string;
   title: string;
   theme: string;
   image: string;
@@ -13,13 +13,12 @@ export interface HierarchyLevel {
   href: string;
 }
 
-// NEW: Types for the Graph
 export interface SubthemeResponse {
   id: number;
   title: string;
   slug: string;
   description: string;
-  created_at: string; 
+  created_at: string;
 }
 
 export interface Connection {
