@@ -52,18 +52,16 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
               className={`
                 tab border-2 border-b-4
                 md:max-w-64 w-full
-                  ${
-                    tab.props.disabled
-                      ? "tab-disabled cursor-not-allowed"
-                      : `${
-                        isActive  
-                          ? `
+                  ${tab.props.disabled
+                  ? "tab-disabled cursor-not-allowed"
+                  : `${isActive
+                    ? `
                             ${activeTheme} border-primary 
                             bg-accent font-bold
                             md:-translate-y-1 
-                            hover:-translate-y-2` 
-                          : `hover:-translate-y-1`}`
-                  }
+                            hover:-translate-y-2`
+                    : `hover:-translate-y-1`}`
+                }
                   `}
             >
               {tab.props.title}

@@ -1,70 +1,44 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { TabItem, Tabs } from "@/components/Tabs";
-import { Suspense } from "react";
+import { TabItem, Tabs } from "@/components/tabs";
+import { Suspense, useEffect, useState } from "react";
+import { HierarchyLevel } from "@/types";
+import { getHierarchyLevels } from "@/lib/api";
+import { GraphDataView } from "@/components/graph/graphDataView";
 
 function CoreContent() {
   const searchParams = useSearchParams();
   const activeTabParam = searchParams.get("tab");
 
-  const items = [
-    {
-      id: "physiology",
-      title: "Physiology",
-      content:
-        "The essentials for survival: air, water, food, and shelter. The foundation upon which all other growth is built.",
-      theme: "physiology-theme",
-      isDisabled: false,
-    },
-    {
-      id: "safety",
-      title: "Safety",
-      content:
-        "Finding stability in a chaotic world. Securing your health, finances, and environment to build a worry-free future.",
-      theme: "safety-theme",
-      isDisabled: false,
-    },
-    {
-      id: "belonging",
-      title: "Belonging",
-      content:
-        "Connecting with the world around you. Cultivating deep relationships, community roots, and the power of shared experiences.",
-      theme: "belonging-theme",
-      isDisabled: false,
-    },
-    {
-      id: "esteem",
-      title: "Esteem",
-      content:
-        "Building confidence and gaining respect. Recognizing your inner worth and achieving the mastery you deserve.",
-      theme: "esteem-theme",
-      isDisabled: false,
-    },
-    {
-      id: "actualization",
-      title: "Self-Actualization",
-      content:
-        "The peak of the journey. Realizing your full potential, pursuing creative growth, and becoming the best version of yourself.",
-      theme: "actualization-theme",
-      isDisabled: false,
-    },
-  ];
+  const [levels, setLevels] = useState<HierarchyLevel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const foundIndex = items.findIndex((item) => item.id === activeTabParam);
+  useEffect(() => {
+    async function loadLevels() {
+      const data = await getHierarchyLevels();
+      if (data) setLevels(data);
+      setIsLoading(false);
+    }
+    loadLevels();
+  }, []);
+
+  if (isLoading) return <div className="p-10 text-center">Loading core frameworks...</div>;
+  if (levels.length === 0) return <div className="p-10 text-center">No hierarchy levels found.</div>;
+
+  const foundIndex = levels.findIndex((level) => level.id === activeTabParam);
   const defaultIndex = foundIndex !== -1 ? foundIndex : 2;
 
   return (
-    <div>
+    <div className="h-full">
       <Tabs key={defaultIndex} defaultIndex={defaultIndex}>
-        {items.map((item, index) => (
+        {levels.map((level, index) => (
           <TabItem
-            key={`${item.title}-${index}`}
-            title={item.title}
-            theme={item.theme}
-            disabled={item.isDisabled}
+            key={`${level.id}-${index}`}
+            title={level.title}
+            theme={level.theme}
           >
-            <div className="h-full w-full">{item.content}</div>
+            <GraphDataView hierarchyId={level.id} />
           </TabItem>
         ))}
       </Tabs>
@@ -74,7 +48,7 @@ function CoreContent() {
 
 export default function Core() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="p-10 text-center">Loading page framework...</div>}>
       <CoreContent />
     </Suspense>
   );
