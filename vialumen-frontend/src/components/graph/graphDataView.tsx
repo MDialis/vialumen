@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { HierarchyGraphResponse } from "@/types";
 import { getHierarchyGraph } from "@/lib/api";
 
-// Stops Next.js from throwing window/canvas errors during SSR
 const Graph = dynamic(
   () => import("@/components/graph/graph"),
   { ssr: false, loading: () => <GraphLoading /> }
@@ -49,24 +48,7 @@ export function GraphDataView({ hierarchyId }: { hierarchyId: string }) {
     );
   }
 
-  // Render the dynamic canvas
-  return (
-    <div className="flex flex-col h-full w-full p-2">
-      <div className="flex justify-between items-center px-4 py-2 mb-2 bg-card rounded-lg border border-border">
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
-          ViaLumen Network
-        </h2>
-        <span className="text-xs font-mono bg-background px-2 py-1 rounded">
-          {graphData.nodes.length} Nodes | {graphData.edges.length} Paths
-        </span>
-      </div>
-
-      {/* The Force Graph Container */}
-      <div className="flex-1 rounded-xl overflow-hidden border-2 border-border shadow-inner">
-        <Graph data={graphData} hierarchyId={hierarchyId} />
-      </div>
-    </div>
-  );
+  return <Graph data={graphData} hierarchyId={hierarchyId} />;
 }
 
 function GraphLoading() {
