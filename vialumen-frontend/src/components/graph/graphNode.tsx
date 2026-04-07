@@ -15,7 +15,7 @@ export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNo
       onClick={() => onClick(node.slug)}
       onPointerDown={(e) => onPointerDown(e, node)}
       onPointerUp={(e) => onPointerUp(e, node)}
-      className="group"
+      className="group node-group"
     >
       {/* Tooltip text */}
       <title>{node.description || node.title}</title>

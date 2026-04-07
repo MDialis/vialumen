@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import * as d3 from "d3-force";
 import { HierarchyGraphResponse } from "@/types";
+import * as d3 from "d3-force";
+import * as d3Zoom from "d3-zoom";
+import * as d3Selection from "d3-selection";
 
 export interface GraphNode extends d3.SimulationNodeDatum {
   id: number;
@@ -17,12 +19,16 @@ export interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
 
 export function useForceGraph(data: HierarchyGraphResponse) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
   const draggedNodeRef = useRef<GraphNode | null>(null);
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [animatedNodes, setAnimatedNodes] = useState<GraphNode[]>([]);
   const [animatedLinks, setAnimatedLinks] = useState<GraphLink[]>([]);
+
+  const [transform, setTransform] = useState<d3Zoom.ZoomTransform>(d3Zoom.zoomIdentity);
+  const transformRef = useRef(d3Zoom.zoomIdentity);
 
   // --- Container Measurement ---
   useEffect(() => {
@@ -69,12 +75,39 @@ export function useForceGraph(data: HierarchyGraphResponse) {
     };
   }, [data, dimensions]);
 
+  // --- NEW: D3 Zoom Behavior ---
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    const svg = d3Selection.select(svgRef.current);
+    
+    const zoomBehavior = d3Zoom
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 3]) // Limit zoom out to 0.1x, zoom in to 3x
+      .filter((event) => {
+        // Always allow the scroll wheel to zoom
+        if (event.type === "wheel") return true;
+        
+        // Only allow panning if the clicked element is NOT inside our 'node-group'
+        return !event.target.closest(".node-group") && !event.button; // !event.button ensures it's a left click
+      })
+      .on("zoom", (e) => {
+        setTransform(e.transform);
+        transformRef.current = e.transform; // Keep ref synced for drag math
+      });
+
+    // Attach the zoom behavior to the SVG
+    svg.call(zoomBehavior);
+
+    return () => {
+      svg.on(".zoom", null); // Cleanup
+    };
+  }, []);
+
   // --- Drag Interactions ---
   const onPointerDown = useCallback((e: React.PointerEvent, node: GraphNode) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     draggedNodeRef.current = node;
-    
-    // "Pin" the node to its current position while dragging
     node.fx = node.x;
     node.fy = node.y;
   }, []);
@@ -85,12 +118,15 @@ export function useForceGraph(data: HierarchyGraphResponse) {
 
     if (!draggedNode || !container) return;
 
-    // Calculate new position relative to the container
     const bounds = container.getBoundingClientRect();
-    draggedNode.fx = e.clientX - bounds.left;
-    draggedNode.fy = e.clientY - bounds.top;
+    const rawX = e.clientX - bounds.left;
+    const rawY = e.clientY - bounds.top;
 
-    // Briefly "reheat" the simulation to allow other nodes to react to the drag
+    // NEW: We must divide by the zoom scale so the node doesn't jump
+    const currentZoom = transformRef.current;
+    draggedNode.fx = (rawX - currentZoom.x) / currentZoom.k;
+    draggedNode.fy = (rawY - currentZoom.y) / currentZoom.k;
+
     if (simulationRef.current) {
       simulationRef.current.alphaTarget(0.3).restart();
     }
@@ -99,20 +135,18 @@ export function useForceGraph(data: HierarchyGraphResponse) {
   const onPointerUp = useCallback((e: React.PointerEvent, node: GraphNode) => {
     e.currentTarget.releasePointerCapture(e.pointerId);
     draggedNodeRef.current = null;
-    
-    // "Unpin" the node so physics can take over again
     node.fx = null;
     node.fy = null;
 
-    // "Cool down" the simulation
     if (simulationRef.current) {
       simulationRef.current.alphaTarget(0);
     }
   }, []);
 
-  // --- Return ---
   return {
     containerRef,
+    svgRef,
+    transform,
     dimensions,
     nodes: animatedNodes,
     links: animatedLinks,
