@@ -46,7 +46,13 @@ func main() {
 	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes/connections", appHandler.GetSubthemesConnectionsByHierarchy)
 	mux.HandleFunc("POST /api/subthemes/connect", appHandler.ConnectSubthemes)
 
-	handler := enableCORS(mux)
+	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
+	if allowedOrigin == "" {
+		allowedOrigin = "http://localhost:3000" // Fallback
+	}
+
+	// Pass it to your handler wrapper
+	handler := enableCORS(mux, allowedOrigin)
 
 	port := "8080"
 
@@ -56,9 +62,9 @@ func main() {
 	}
 }
 
-func enableCORS(next http.Handler) http.Handler {
+func enableCORS(next http.Handler, allowedOrigin string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 

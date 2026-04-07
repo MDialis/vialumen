@@ -1,143 +1,174 @@
 "use client";
 
-import { useRef, useCallback, useEffect, useState } from "react";
-import ForceGraph2D from "react-force-graph-2d";
-import { HierarchyGraphResponse } from "@/types";
+import { useEffect, useRef, useState, useMemo } from "react";
+import * as d3 from "d3-force";
 import { useRouter } from "next/navigation";
+import { HierarchyGraphResponse } from "@/types";
+
+interface GraphNode extends d3.SimulationNodeDatum {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  created_at: string;
+}
+
+interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
+  source: number | GraphNode;
+  target: number | GraphNode;
+}
 
 interface GraphProps {
-    data: HierarchyGraphResponse;
-    hierarchyId: string;
+  data: HierarchyGraphResponse;
+  hierarchyId: string;
 }
 
 export default function Graph({ data, hierarchyId }: GraphProps) {
-    const graphRef = useRef<any>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-    const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-    const [themeColors, setThemeColors] = useState({
-        node: "#1c327f",
-        link: "#646464",
-        text: "#000000",
+  const simulationRef = useRef<d3.Simulation<any, any> | null>(null);
+  const draggedNodeRef = useRef<any>(null);
+
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+
+  const [animatedNodes, setAnimatedNodes] = useState<any[]>([]);
+  const [animatedLinks, setAnimatedLinks] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      setDimensions({ width, height });
     });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
-    // Auto-resize the canvas
-    useEffect(() => {
-        if (!containerRef.current) return;
-        const observer = new ResizeObserver((entries) => {
-            const { width, height } = entries[0].contentRect;
-            setDimensions({ width, height });
-        });
-        observer.observe(containerRef.current);
-        return () => observer.disconnect();
-    }, []);
+  useEffect(() => {
+    if (dimensions.width === 0) return;
 
-    // Extract dynamic theme colors
-    useEffect(() => {
-        if (!containerRef.current) return;
+    const nodes: GraphNode[] = data.nodes.map((n) => ({ ...n }));
+    const links: GraphLink[] = data.edges.map((e) => ({ ...e }));
 
-        // Read the actual CSS variables being applied to this specific container
-        const styles = getComputedStyle(containerRef.current);
+    const simulation = d3
+      .forceSimulation<GraphNode, GraphLink>(nodes)
+      .force(
+        "link",
+        d3
+          .forceLink<GraphNode, GraphLink>(links)
+          .id((d) => d.id)
+          .distance(150),
+      )
+      .force("charge", d3.forceManyBody().strength(-400))
+      .force(
+        "center",
+        d3.forceCenter(dimensions.width / 2, dimensions.height / 2),
+      )
+      .on("tick", () => {
+        setAnimatedNodes([...nodes]);
+        setAnimatedLinks([...links]);
+      });
 
-        const primary = styles.getPropertyValue("--primary").trim();
-        const muted = styles.getPropertyValue("--muted-foreground").trim();
-        const foreground = styles.getPropertyValue("--foreground").trim();
+    simulationRef.current = simulation;
 
-        if (primary && muted) {
-            setThemeColors({
-                node: primary,
-                link: muted,
-                text: foreground,
-            });
-        }
-    }, []);
-
-    const processedEdges = [...data.edges];
-
-    if (data.nodes.length > 0) {
-        // Find the main node (Assuming its slug matches the hierarchyId)
-        // If it doesn't match perfectly, fallback to the very first node in the array
-        const mainNode = data.nodes.find(n => n.slug === hierarchyId) || data.nodes[0];
-
-        // Get a Set of all node IDs that are currently being targeted by an edge
-        const targetedNodeIds = new Set(data.edges.map(e => e.target));
-
-        data.nodes.forEach((node) => {
-            // If the node is NOT the main node, and nothing is connecting TO it...
-            if (node.id !== mainNode.id && !targetedNodeIds.has(node.id)) {
-                // ...create a virtual edge from the main node to this orphan node!
-                processedEdges.push({
-                    source: mainNode.id,
-                    target: node.id
-                });
-            }
-        });
-    }
-
-    const graphData = {
-        nodes: data.nodes.map((node) => ({ ...node, val: 2 })),
-        links: processedEdges.map((edge) => ({
-            source: edge.source,
-            target: edge.target,
-        })),
+    return () => {
+      simulation.stop();
     };
+  }, [data, dimensions]);
 
-    const paintNodeText = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-        const label = node.title;
+  const handlePointerDown = (e: React.PointerEvent, node: any) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    draggedNodeRef.current = node;
 
-        // This math keeps the font size consistent on your screen no matter how far you zoom in/out
-        const fontSize = 12 / globalScale;
+    node.fx = node.x;
+    node.fy = node.y;
+  };
 
-        ctx.font = `${fontSize}px Sans-Serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        ctx.fillStyle = themeColors.text;
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggedNodeRef.current || !containerRef.current) return;
 
-        // Draw the text slightly below the node (y + 8)
-        ctx.fillText(label, node.x, node.y + 8);
-    }, [themeColors.text]);
+    const bounds = containerRef.current.getBoundingClientRect();
+    const node = draggedNodeRef.current;
 
-    // Handle Node Clicks
-    const handleNodeClick = useCallback((node: any) => {
-        if (graphRef.current) {
-            graphRef.current.centerAt(node.x, node.y, 800);
-            graphRef.current.zoom(4, 800);
+    node.fx = e.clientX - bounds.left;
+    node.fy = e.clientY - bounds.top;
 
-            setTimeout(() => {
-                router.push(`/${node.slug}`);
-            }, 800);
-        }
-    }, [router]);
+    if (simulationRef.current) {
+      simulationRef.current.alphaTarget(0.3).restart();
+    }
+  };
 
-    return (
-        <div ref={containerRef} className="w-full h-full min-h-[60vh] bg-background/50 rounded-2xl">
-            <ForceGraph2D
-                ref={graphRef}
-                width={dimensions.width}
-                height={dimensions.height}
-                graphData={graphData}
+  const handlePointerUp = (e: React.PointerEvent, node: any) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    draggedNodeRef.current = null;
 
-                // Feed the dynamic CSS variables into the Canvas!
-                nodeLabel="title" // Tooltip on hover
-                nodeColor={() => themeColors.node}
-                linkColor={() => themeColors.link}
-                backgroundColor="transparent"
+    node.fx = null;
+    node.fy = null;
 
-                // Custom Text Rendering
-                nodeCanvasObjectMode={() => "after"}
-                nodeCanvasObject={paintNodeText}
+    if (simulationRef.current) {
+      simulationRef.current.alphaTarget(0);
+    }
+  };
 
-                // "Path" directional arrows
-                linkDirectionalArrowLength={4}
-                linkDirectionalArrowRelPos={1}
+  const handleNodeClick = (slug: string) => {
+    router.push(`/${slug}`);
+  };
 
-                // Interaction
-                onNodeClick={handleNodeClick}
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full min-h-[60vh] bg-background/50 rounded-2xl relative overflow-hidden"
+    >
+      <svg
+        width={dimensions.width}
+        height={dimensions.height}
+        onPointerMove={handlePointerMove}
+        className="w-full h-full touch-none"
+      >
+        {animatedLinks.map((link, i) => (
+          <line
+            key={`link-${i}`}
+            x1={link.source.x}
+            y1={link.source.y}
+            x2={link.target.x}
+            y2={link.target.y}
+            stroke="var(--muted-foreground)"
+            strokeWidth={2}
+            opacity={0.6}
+          />
+        ))}
 
-                // Physics settings
-                d3VelocityDecay={0.3}
+        {/* Draw Nodes */}
+        {animatedNodes.map((node) => (
+          <g
+            key={node.id}
+            transform={`translate(${node.x || 0}, ${node.y || 0})`}
+            style={{ cursor: "pointer" }}
+            onClick={() => handleNodeClick(node.slug)}
+            onPointerDown={(e) => handlePointerDown(e, node)}
+            onPointerUp={(e) => handlePointerUp(e, node)}
+            className="group"
+          >
+            <title>{node.description || node.title}</title>
+
+            <circle
+              r={16}
+              fill="var(--primary)"
+              className="transition-all duration-200 group-hover:scale-110 group-hover:fill-yellow-400"
             />
-        </div>
-    );
+
+            <text
+              y={28}
+              textAnchor="middle"
+              fill="var(--foreground)"
+              className="text-xs font-medium pointer-events-none select-none transition-all duration-200 group-hover:font-bold"
+            >
+              {node.title}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
 }
