@@ -29,6 +29,8 @@ export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNo
     onClick(node.slug);
   };
 
+  const radius = node.radius || 12;
+
   return (
     <g
       transform={`translate(${node.x || 0}, ${node.y || 0})`}
@@ -43,14 +45,14 @@ export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNo
 
       {/* The colored circle */}
       <circle
-        r={24}
+        r={radius}
         fill="var(--primary)"
         className="transition-all duration-300 group-hover:scale-115 group-hover:fill-secondary"
       />
 
       {/* The label below the circle */}
       <text
-        y={40}
+        y={radius + 16}
         textAnchor="middle"
         fill="var(--foreground)"
         className="
