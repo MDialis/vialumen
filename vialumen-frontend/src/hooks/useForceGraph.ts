@@ -75,20 +75,20 @@ export function useForceGraph(data: HierarchyGraphResponse) {
     };
   }, [data, dimensions]);
 
-  // --- NEW: D3 Zoom Behavior ---
+  // --- D3 Zoom Behavior ---
   useEffect(() => {
     if (!svgRef.current) return;
 
     const svg = d3Selection.select(svgRef.current);
-    
+
     const zoomBehavior = d3Zoom
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 3]) // Limit zoom out to 0.1x, zoom in to 3x
       .filter((event) => {
         // Always allow the scroll wheel to zoom
         if (event.type === "wheel") return true;
-        
-        // Only allow panning if the clicked element is NOT inside our 'node-group'
+
+        // Only allow panning if the clicked element is NOT inside 'node-group'
         return !event.target.closest(".node-group") && !event.button; // !event.button ensures it's a left click
       })
       .on("zoom", (e) => {
@@ -122,7 +122,7 @@ export function useForceGraph(data: HierarchyGraphResponse) {
     const rawX = e.clientX - bounds.left;
     const rawY = e.clientY - bounds.top;
 
-    // NEW: We must divide by the zoom scale so the node doesn't jump
+    // We must divide by the zoom scale so the node doesn't jump
     const currentZoom = transformRef.current;
     draggedNode.fx = (rawX - currentZoom.x) / currentZoom.k;
     draggedNode.fy = (rawY - currentZoom.y) / currentZoom.k;

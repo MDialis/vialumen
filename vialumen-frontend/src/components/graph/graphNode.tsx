@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { GraphNode as GraphNodeType } from "@/hooks/useForceGraph";
 
 interface GraphNodeProps {
@@ -8,12 +9,32 @@ interface GraphNodeProps {
 }
 
 export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNodeProps) => {
+  const clickStartPos = useRef({ x: 0, y: 0 });
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    clickStartPos.current = { x: e.clientX, y: e.clientY };
+
+    onPointerDown(e, node);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    const dx = Math.abs(e.clientX - clickStartPos.current.x);
+    const dy = Math.abs(e.clientY - clickStartPos.current.y);
+
+    if (dx > 5 || dy > 5) {
+      e.preventDefault();
+      return;
+    }
+
+    onClick(node.slug);
+  };
+
   return (
     <g
       transform={`translate(${node.x || 0}, ${node.y || 0})`}
       style={{ cursor: "pointer" }}
-      onClick={() => onClick(node.slug)}
-      onPointerDown={(e) => onPointerDown(e, node)}
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
       onPointerUp={(e) => onPointerUp(e, node)}
       className="group node-group"
     >
