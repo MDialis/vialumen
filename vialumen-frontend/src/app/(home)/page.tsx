@@ -77,11 +77,11 @@ export default async function Home() {
             <Card
               key={level.title}
               className={`
-            relative mx-auto w-full max-w-md
-            pt-0 overflow-hidden
-            hover:brightness-105 hover:scale-105 
-            transition ${level.theme}
-            flex flex-col h-full
+                relative mx-auto w-full max-w-md
+                pt-0 overflow-hidden
+                hover:brightness-105 hover:scale-105 
+                transition ${level.theme}
+                flex flex-col h-full
             `}
             >
               <div className="absolute inset-0 z-30 aspect-video bg-black/35" />

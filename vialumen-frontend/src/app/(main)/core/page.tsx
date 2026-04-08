@@ -5,7 +5,7 @@ import { TabItem, Tabs } from "@/components/tabs";
 import { Suspense, useEffect, useState } from "react";
 import { HierarchyLevel } from "@/types";
 import { getHierarchyLevels } from "@/lib/api";
-import { GraphDataView } from "@/components/graph/graphDataView";
+import { GraphDataView } from "@/components/graph/graph-data-view";
 
 function CoreContent() {
   const searchParams = useSearchParams();

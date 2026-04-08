@@ -6,6 +6,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "./ui/input-group";
+import Link from "next/link";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -20,13 +21,13 @@ export default function Navbar() {
     >
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
         <div className="flex-1 flex justify-start">
-          <a href="/" className="hover:opacity-85 px-2 py-1 rounded-lg">
+          <Link href="/" className="hover:opacity-85 px-2 py-1 rounded-lg">
             <h1
               className={`text-2xl font-semibold text-constant-white ${fredoka.className}`}
             >
               VIALUMEN
             </h1>
-          </a>
+          </Link>
         </div>
 
         <div className="max-w-sm w-full">

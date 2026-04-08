@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { HierarchyGraphResponse } from "@/types";
 import { useForceGraph } from "@/hooks/useForceGraph";
-import { GraphLink } from "./graphLink";
-import { GraphNode } from "./graphNode";
+import { GraphLink } from "./graph-link";
+import { GraphNode } from "./graph-node";
 
 interface GraphProps {
   data: HierarchyGraphResponse;
@@ -47,7 +47,7 @@ export default function Graph({ data, hierarchyId }: GraphProps) {
             <GraphNode
               key={node.id}
               node={node}
-              onClick={(slug) => router.push(`/${slug}`)}
+              onClick={(slug) => router.push(`/path/${slug}?theme=${hierarchyId}`)}
               onPointerDown={dragHandlers.onPointerDown}
               onPointerUp={dragHandlers.onPointerUp}
             />
