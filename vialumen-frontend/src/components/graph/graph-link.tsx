@@ -1,4 +1,4 @@
-import { GraphNode } from "@/hooks/useForceGraph";
+import { GraphNode } from "@/hooks/use-force-graph";
 
 export const GraphLink = ({ link }: { link: any }) => {
   const source = link.source as GraphNode;

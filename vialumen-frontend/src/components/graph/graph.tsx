@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { HierarchyGraphResponse } from "@/types";
-import { useForceGraph } from "@/hooks/useForceGraph";
+import { useForceGraph } from "@/hooks/use-force-graph";
 import { GraphLink } from "./graph-link";
 import { GraphNode } from "./graph-node";
 

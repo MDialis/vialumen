@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { GraphNode as GraphNodeType } from "@/hooks/useForceGraph";
+import { GraphNode as GraphNodeType } from "@/hooks/use-force-graph";
 
 interface GraphNodeProps {
   node: GraphNodeType;
