@@ -40,11 +40,14 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/health", handlers.HealthCheck)
-	mux.HandleFunc("GET /api/hierarchy", appHandler.GetHierarchyLevels)
+	mux.HandleFunc("GET /api/hierarchies", appHandler.GetHierarchyLevels)
+	//	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
+	mux.HandleFunc("GET /api/core/{id}", appHandler.GetSubthemesConnectionsByHierarchy)
+	mux.HandleFunc("GET /api/path/{slug}", appHandler.GetOfficialSubthemeBySlug)
+
 	mux.HandleFunc("POST /api/subthemes", appHandler.CreateSubtheme)
-	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
-	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes/connections", appHandler.GetSubthemesConnectionsByHierarchy)
 	mux.HandleFunc("POST /api/subthemes/connect", appHandler.ConnectSubthemes)
+	mux.HandleFunc("POST /api/official", appHandler.CreateOfficialVersion)
 
 	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
 	if allowedOrigin == "" {
