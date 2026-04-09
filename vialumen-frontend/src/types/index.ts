@@ -30,3 +30,30 @@ export interface HierarchyGraphResponse {
   nodes: SubthemeResponse[];
   edges: Connection[];
 }
+
+export interface ContributorResponse {
+  name: string;
+  role: string;
+}
+
+export interface SourceResponse {
+  title: string;
+  url?: string;
+}
+
+export interface ContentBlockResponse {
+  version_id: number;
+  content_type: string;
+  content_text: string;
+  has_older_versions?: boolean;
+  contributors?: ContributorResponse[];
+  sources?: SourceResponse[];
+}
+
+export interface OfficialPageResponse {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  blocks: ContentBlockResponse[];
+}
