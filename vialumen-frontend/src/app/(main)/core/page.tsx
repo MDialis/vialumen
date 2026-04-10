@@ -1,32 +1,26 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-import { TabItem, Tabs } from "@/components/tabs";
-import { Suspense, useEffect, useState } from "react";
-import { HierarchyLevel } from "@/types";
 import { getHierarchyLevels } from "@/lib/api";
+import { Tabs, TabItem } from "@/components/tabs";
 import { GraphDataView } from "@/components/graph/graph-data-view";
 
-function CoreContent() {
-  const searchParams = useSearchParams();
-  const activeTabParam = searchParams.get("tab");
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-  const [levels, setLevels] = useState<HierarchyLevel[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default async function Core({ searchParams }: Props) {
+  const [levels, resolvedSearchParams] = await Promise.all([
+    getHierarchyLevels(),
+    searchParams,
+  ]);
 
-  useEffect(() => {
-    async function loadLevels() {
-      const data = await getHierarchyLevels();
-      if (data) setLevels(data);
-      setIsLoading(false);
-    }
-    loadLevels();
-  }, []);
+  if (!levels || levels.length === 0) {
+    return <div className="p-10 text-center">No hierarchy levels found.</div>;
+  }
 
-  if (isLoading) return <div className="p-10 text-center">Loading core frameworks...</div>;
-  if (levels.length === 0) return <div className="p-10 text-center">No hierarchy levels found.</div>;
+  const activeTabParam = resolvedSearchParams.tab;
+  
+  const tabId = Array.isArray(activeTabParam) ? activeTabParam[0] : activeTabParam;
 
-  const foundIndex = levels.findIndex((level) => level.id === activeTabParam);
+  const foundIndex = levels.findIndex((level) => level.id === tabId);
   const defaultIndex = foundIndex !== -1 ? foundIndex : 2;
 
   return (
@@ -43,13 +37,5 @@ function CoreContent() {
         ))}
       </Tabs>
     </div>
-  );
-}
-
-export default function Core() {
-  return (
-    <Suspense fallback={<div className="p-10 text-center">Loading page framework...</div>}>
-      <CoreContent />
-    </Suspense>
   );
 }

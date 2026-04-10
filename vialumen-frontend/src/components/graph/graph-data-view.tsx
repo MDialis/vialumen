@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { HierarchyGraphResponse } from "@/types";
+import useSWR from "swr";
 import { getHierarchyGraph } from "@/lib/api";
 
 const Graph = dynamic(
@@ -11,28 +10,15 @@ const Graph = dynamic(
 );
 
 export function GraphDataView({ hierarchyId }: { hierarchyId: string }) {
-  const [graphData, setGraphData] = useState<HierarchyGraphResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadData() {
-      setIsLoading(true);
-      const data = await getHierarchyGraph(hierarchyId);
-      if (isMounted) {
-        setGraphData(data);
-        setIsLoading(false);
-      }
-    }
-
-    loadData();
-    return () => { isMounted = false; };
-  }, [hierarchyId]);
+  // SWR handles the loading state, caching, and deduplication
+  const { data: graphData, isLoading, error } = useSWR(
+    hierarchyId ? `graph-${hierarchyId}` : null, 
+    () => getHierarchyGraph(hierarchyId)
+  );
 
   if (isLoading) return <GraphLoading />;
 
-  if (!graphData) {
+  if (error || !graphData) {
     return (
       <div className="p-10 text-destructive font-bold text-center">
         Failed to load graph data for {hierarchyId}.

@@ -68,7 +68,7 @@ export default async function Home() {
         {!hierarchyLevels || hierarchyLevels.length === 0 ? (
           <div className="col-span-full text-center text-muted-foreground">
             <p>
-              We couldn't load the content summary right now. Please try again
+              We couldn&apos;t load the content summary right now. Please try again
               later.
             </p>
           </div>
