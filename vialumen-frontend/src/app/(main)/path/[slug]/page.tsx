@@ -6,6 +6,7 @@ import ContentMeta from "@/components/content-meta";
 import { OfficialPageResponse, ContentBlockResponse } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { notFound } from "next/navigation";
 
 export default async function PathPage({
   params,
@@ -16,24 +17,18 @@ export default async function PathPage({
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  
+
   // Strongly type the API response
   const content: OfficialPageResponse | null = await getOfficialSubthemeBySlug(resolvedParams.slug);
 
   if (!content) {
-    return (
-      <ThemeWrapper>
-        <div className="flex items-center justify-center min-h-screen text-destructive text-xl font-bold">
-          404 - The path &quot;{resolvedParams.slug}&quot; could not be found.
-        </div>
-      </ThemeWrapper>
-    );
+    notFound();
   }
 
   // Determine active tab from the URL (?tab=...) or fallback to the first block
   const tabQuery = resolvedSearchParams.tab as string;
   const activeTabId = tabQuery ? Number(tabQuery) : content.blocks?.[0]?.version_id;
-  
+
   // Find the content for the active tab
   const activeBlock = content.blocks?.find((b: ContentBlockResponse) => b.version_id === activeTabId) || content.blocks?.[0];
 
@@ -41,7 +36,7 @@ export default async function PathPage({
     <ThemeWrapper>
       <div className="min-h-screen p-8 bg-background text-foreground transition-colors duration-300">
         <div className="max-w-4xl mx-auto space-y-10">
-          
+
           <div className="flex items-center justify-between p-2 mb-2">
             <h1 className="text-4xl font-black text-foreground">
               {content.title}
@@ -50,7 +45,7 @@ export default async function PathPage({
               {/* TODO: Menu with tools */}
             </div>
           </div>
-          
+
           <Separator className="bg-border/50" />
 
           {content.blocks && content.blocks.length > 0 && activeBlock ? (
@@ -75,7 +70,7 @@ export default async function PathPage({
               </CardContent>
             </Card>
           )}
-          
+
         </div>
       </div>
     </ThemeWrapper>
