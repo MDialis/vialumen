@@ -1,6 +1,6 @@
 module github.com/MDialis/vialumen-backend
 
-go 1.26.1
+go 1.26.0
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
