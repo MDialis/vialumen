@@ -1,7 +1,6 @@
 import { ContentBlockResponse } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 export default function ContentBody({
   block,
@@ -9,7 +8,7 @@ export default function ContentBody({
   block: ContentBlockResponse;
 }) {
   return (
-    <Card className="shadow-sm border-border">
+    <Card>
       <CardContent>
         <p className="whitespace-pre-wrap leading-relaxed text-lg">
           {block.content_text}
