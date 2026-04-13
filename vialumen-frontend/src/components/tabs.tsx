@@ -56,10 +56,10 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
                   ? "tab-disabled cursor-not-allowed"
                   : `${isActive
                     ? `
-                            ${activeTheme} border-primary 
-                            bg-accent font-bold
-                            md:-translate-y-1 
-                            hover:-translate-y-2`
+                      ${activeTheme} border-primary 
+                      bg-accent font-bold
+                      md:-translate-y-1 
+                      hover:-translate-y-2`
                     : `hover:-translate-y-1`}`
                 }
                   `}

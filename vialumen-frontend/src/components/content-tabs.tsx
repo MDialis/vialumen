@@ -1,13 +1,15 @@
-import Link from "next/link";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ContentBlockResponse } from "@/types";
 
 interface ContentTabsProps {
   blocks: ContentBlockResponse[];
   activeTabId: number | string;
+  onTabChange: (id: number | string) => void;
 }
 
-export default function ContentTabs({ blocks, activeTabId }: ContentTabsProps) {
+export default function ContentTabs({ blocks, activeTabId, onTabChange }: ContentTabsProps) {
   return (
     <div className="flex flex-wrap gap-3 pb-4 border-b border-border/50">
       {blocks.map((block) => {
@@ -18,11 +20,9 @@ export default function ContentTabs({ blocks, activeTabId }: ContentTabsProps) {
             key={block.version_id}
             variant={isActive ? "default" : "outline"}
             className="uppercase tracking-wider font-bold"
-            asChild
+            onClick={() => onTabChange(block.version_id)}
           >
-            <Link href={`?tab=${block.version_id}`} scroll={false}>
-              {block.content_type}
-            </Link>
+            {block.content_type}
           </Button>
         );
       })}
