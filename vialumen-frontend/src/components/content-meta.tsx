@@ -1,77 +1,107 @@
 import { ContentBlockResponse } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Users, ExternalLink } from "lucide-react";
 
 interface ContentMetaProps {
-  contributors: ContentBlockResponse["contributors"];
-  sources: ContentBlockResponse["sources"];
+  contributors?: ContentBlockResponse["contributors"];
+  sources?: ContentBlockResponse["sources"];
 }
 
-export default function ContentMeta({ contributors, sources }: ContentMetaProps) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-0 md:pl-8 border-l-0 md:border-l-4 border-primary/20 mt-6">
-      
-      {/* Contributors Card */}
-      <Card className="bg-accent text-accent-foreground border-border shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm uppercase tracking-wider opacity-80">
-            Contributors
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {contributors && contributors.length > 0 ? (
-            <ul className="space-y-2">
-              {contributors.map((c, index) => (
-                <li
-                  key={index}
-                  className="flex justify-between items-center text-sm bg-background/50 p-2 rounded"
-                >
-                  <span className="font-semibold">{c.name}</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {c.role}
-                  </Badge>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm opacity-70">No contributors.</p>
-          )}
-        </CardContent>
-      </Card>
+export default function ContentMeta({
+  contributors = [],
+  sources = [],
+}: ContentMetaProps) {
+  if (!contributors.length && !sources.length) return null;
 
-      {/* Sources Card */}
-      <Card className="bg-secondary text-secondary-foreground border-border shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm uppercase tracking-wider opacity-80">
-            Sources
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {sources && sources.length > 0 ? (
-            <ul className="space-y-2 list-disc list-inside">
-              {sources.map((s, index) => (
-                <li key={index} className="text-sm">
-                  {s.url ? (
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline hover:text-primary transition-colors"
+  return (
+    <div className="mt-8 border-t border-border pt-2 w-full">
+      <Accordion type="multiple" className="w-full">
+        {/* Sources Section */}
+        {sources.length > 0 && (
+          <AccordionItem value="sources" className="border-b-0">
+            <AccordionTrigger className="text-sm text-muted-foreground hover:text-foreground py-3">
+              <div className="flex items-center gap-2">
+                <ExternalLink className="w-4 h-4" />
+                <span className="font-medium tracking-wide">Sources</span>
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-[10px] h-5 px-1.5 rounded-full"
+                >
+                  {sources.length}
+                </Badge>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <ul className="space-y-2 pt-1">
+                {sources.map(({ url, title }, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-2 text-sm text-muted-foreground"
+                  >
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
+                    {url ? (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-primary transition-colors underline underline-offset-4 decoration-border hover:decoration-primary"
+                      >
+                        {title}
+                      </a>
+                    ) : (
+                      <span>{title}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {/* Contributors Section */}
+        {contributors.length > 0 && (
+          <AccordionItem value="contributors" className="border-b-border/50">
+            <AccordionTrigger className="text-sm text-muted-foreground hover:text-foreground py-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                <span className="font-medium tracking-wide">Contributors</span>
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-[10px] h-5 px-1.5 rounded-full"
+                >
+                  {contributors.length}
+                </Badge>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <div className="flex flex-wrap gap-2 pt-1">
+                {contributors.map(({ name, role }, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-secondary/40 border border-border/50 px-3 py-1.5 rounded-full text-sm transition-colors hover:bg-secondary/60"
+                  >
+                    <span className="font-medium text-secondary-foreground">
+                      {name}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] h-4 px-1.5 py-0 border-primary/20 text-muted-foreground"
                     >
-                      {s.title}
-                    </a>
-                  ) : (
-                    <span>{s.title}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm opacity-70">No sources listed.</p>
-          )}
-        </CardContent>
-      </Card>
-      
+                      {role}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
     </div>
   );
 }

@@ -24,15 +24,15 @@ export default async function PathPage({
   return (
     <ThemeWrapper>
       <div className="min-h-screen p-8 bg-background text-foreground transition-colors duration-300">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <div className="flex items-center justify-between p-2 mb-2">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between p-2">
             <h1 className="text-4xl font-black text-foreground">
               {content.title}
             </h1>
             <div>{/* TODO: Menu with tools */}</div>
           </div>
 
-          <Separator className="bg-border/50" />
+          <Separator className="bg-border" />
 
           {content.blocks && content.blocks.length > 0 ? (
             <ContentGroup blocks={content.blocks} />

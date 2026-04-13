@@ -11,7 +11,7 @@ interface ContentTabsProps {
 
 export default function ContentTabs({ blocks, activeTabId, onTabChange }: ContentTabsProps) {
   return (
-    <div className="flex flex-wrap gap-3 pb-4 border-b border-border/50">
+    <div className="flex flex-wrap gap-3 py-2 border-b border-border/50">
       {blocks.map((block) => {
         const isActive = String(activeTabId) === String(block.version_id);
         
