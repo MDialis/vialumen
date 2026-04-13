@@ -68,8 +68,8 @@ export default async function Home() {
         {!hierarchyLevels || hierarchyLevels.length === 0 ? (
           <div className="col-span-full text-center text-muted-foreground">
             <p>
-              We couldn&apos;t load the content summary right now. Please try again
-              later.
+              We couldn&apos;t load the content summary right now. Please try
+              again later.
             </p>
           </div>
         ) : (
@@ -78,24 +78,16 @@ export default async function Home() {
               key={level.title}
               className={`
                 relative mx-auto w-full max-w-md
-                pt-0 overflow-hidden
                 hover:brightness-105 hover:scale-105 
                 transition ${level.theme}
                 flex flex-col h-full
             `}
             >
-              <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-              <img
-                src={level.image}
-                alt={`${level.title} cover`}
-                className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-              />
-
               <CardHeader>
+                <CardTitle>{level.title}</CardTitle>
                 <CardAction>
                   <Badge variant="ghost">Featured</Badge>
                 </CardAction>
-                <CardTitle>{level.title}</CardTitle>
                 <CardDescription className="hidden md:block">
                   {level.description}
                 </CardDescription>

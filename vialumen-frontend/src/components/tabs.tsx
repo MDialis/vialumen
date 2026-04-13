@@ -47,21 +47,20 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
             <Button
               key={index}
               role="tab"
-              variant="outline"
+              variant={isActive ? "default" : "outline"}
               onClick={() => !tab.props.disabled && setActiveTabIndex(index)}
               className={`
-                tab border-2 border-b-4
-                md:max-w-64 w-full
+                relative tab md:max-w-64 w-full 
+                after:absolute after:inset-x-0 after:-bottom-4 after:top-0
                   ${tab.props.disabled
-                  ? "tab-disabled cursor-not-allowed"
-                  : `${isActive
-                    ? `
-                      ${activeTheme} border-primary 
-                      bg-accent font-bold
-                      md:-translate-y-1 
-                      hover:-translate-y-2`
-                    : `hover:-translate-y-1`}`
-                }
+                    ? "tab-disabled cursor-not-allowed"
+                    : `${isActive
+                      ? `
+                        ${activeTheme} font-bold
+                        md:-translate-y-1 
+                        hover:-translate-y-2`
+                      : `hover:-translate-y-1`}`
+                  }
                   `}
             >
               {tab.props.title}
