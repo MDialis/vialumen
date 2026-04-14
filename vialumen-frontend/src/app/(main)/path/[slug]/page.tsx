@@ -35,7 +35,7 @@ export default async function PathPage({
           <Separator className="bg-border" />
 
           {content.blocks && content.blocks.length > 0 ? (
-            <ContentGroup blocks={content.blocks} />
+            <ContentGroup blocks={content.blocks} slug={content.slug} />
           ) : (
             <Card className="border-2 border-dashed border-border text-center shadow-none bg-card">
               <CardHeader>

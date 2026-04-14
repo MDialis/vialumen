@@ -58,6 +58,15 @@ export interface OfficialPageResponse {
   blocks: ContentBlockResponse[];
 }
 
+export interface VersionBlockResponse {
+  version_id: number;
+  content_type: string;
+  content_text: string;
+  has_older_versions: boolean;
+  contributors?: ContributorResponse[];
+  sources?: SourceResponse[];
+}
+
 export interface VersionMetaResponse {
   version_id: number;
   accepted_at: string;

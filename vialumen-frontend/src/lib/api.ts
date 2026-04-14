@@ -2,6 +2,7 @@ import {
   HierarchyGraphResponse,
   HierarchyLevel,
   OfficialPageResponse,
+  VersionBlockResponse,
   VersionMetaResponse,
 } from "@/types";
 
@@ -99,7 +100,7 @@ export async function getOfficialSubthemeVersionList(
   }
 }
 
-export async function getSpecificVersion(id: string): Promise<OfficialPageResponse | null> {
+export async function getSpecificVersion(id: string): Promise<VersionBlockResponse | null> {
   try {
     const response = await fetch(
       `${API}/version/${id}`,
