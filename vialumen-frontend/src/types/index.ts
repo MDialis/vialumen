@@ -57,3 +57,9 @@ export interface OfficialPageResponse {
   description?: string;
   blocks: ContentBlockResponse[];
 }
+
+export interface VersionMetaResponse {
+  version_id: number;
+  accepted_at: string;
+  is_active: boolean;
+}
