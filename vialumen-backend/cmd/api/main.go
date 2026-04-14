@@ -44,6 +44,8 @@ func main() {
 	//	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
 	mux.HandleFunc("GET /api/core/{id}", appHandler.GetSubthemesConnectionsByHierarchy)
 	mux.HandleFunc("GET /api/path/{slug}", appHandler.GetOfficialSubthemeBySlug)
+	mux.HandleFunc("GET /api/path/{slug}/{contentType}", appHandler.GetVersionHistory)
+	mux.HandleFunc("GET /api/version/{id}", appHandler.GetSpecificVersion)
 
 	mux.HandleFunc("POST /api/subthemes", appHandler.CreateSubtheme)
 	mux.HandleFunc("POST /api/subthemes/connect", appHandler.ConnectSubthemes)

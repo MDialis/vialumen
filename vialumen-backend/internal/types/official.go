@@ -38,3 +38,9 @@ type Source struct {
 	URL               *string `json:"url"`
 	SourceType        string  `json:"source_type"`
 }
+
+type VersionHistoryItem struct {
+	VersionID  int    `json:"version_id"`
+	AcceptedAt string `json:"accepted_at"`
+	IsActive   bool   `json:"is_active"`
+}
