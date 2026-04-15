@@ -5,6 +5,8 @@ import { OfficialPageResponse } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
+import { ContentProvider } from "@/components/content-context";
+import ContentToolbar from "@/components/content-toolbar";
 
 export default async function PathPage({
   params,
@@ -25,17 +27,21 @@ export default async function PathPage({
     <ThemeWrapper>
       <div className="min-h-screen p-8 bg-background text-foreground transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between p-2">
-            <h1 className="text-4xl font-black text-foreground">
-              {content.title}
-            </h1>
-            <div>{/* TODO: Menu with tools */}</div>
-          </div>
-
-          <Separator className="bg-border" />
-
           {content.blocks && content.blocks.length > 0 ? (
-            <ContentGroup blocks={content.blocks} slug={content.slug} />
+            <ContentProvider blocks={content.blocks} slug={content.slug}>
+              <div className="flex items-center justify-between p-2">
+                <h1 className="text-4xl font-black text-foreground">
+                  {content.title}
+                </h1>
+                <div>
+                  <ContentToolbar />
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <ContentGroup />
+            </ContentProvider>
           ) : (
             <Card className="border-2 border-dashed border-border text-center shadow-none bg-card">
               <CardHeader>
