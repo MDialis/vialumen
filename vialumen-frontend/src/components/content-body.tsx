@@ -1,6 +1,6 @@
 "use client";
 
-import { useContentContext } from "@/components/content-context";
+import { useContentContext } from "@/contexts/content-context";
 
 export default function ContentBody() {
   const { displayedBlock, isFetchingText } = useContentContext();

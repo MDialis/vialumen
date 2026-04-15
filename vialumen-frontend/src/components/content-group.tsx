@@ -3,7 +3,7 @@
 import ContentTabs from "@/components/content-tabs";
 import ContentBody from "@/components/content-body";
 import ContentMeta from "@/components/content-meta";
-import { useContentContext } from "@/components/content-context";
+import { useContentContext } from "@/contexts/content-context";
 
 export default function ContentGroup() {
   const { blocks, activeTabId, setActiveTabId, displayedBlock } = useContentContext();

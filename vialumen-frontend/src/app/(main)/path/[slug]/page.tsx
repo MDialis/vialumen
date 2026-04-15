@@ -5,7 +5,7 @@ import { OfficialPageResponse } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
-import { ContentProvider } from "@/components/content-context";
+import { ContentProvider } from "@/contexts/content-context";
 import ContentToolbar from "@/components/content-toolbar";
 
 export default async function PathPage({
