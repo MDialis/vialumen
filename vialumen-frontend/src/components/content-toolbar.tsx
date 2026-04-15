@@ -2,12 +2,13 @@
 
 import { useContentContext } from "@/contexts/content-context";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { History, Loader2 } from "lucide-react";
 
 export default function ContentToolbar() {
@@ -20,9 +21,9 @@ export default function ContentToolbar() {
     handleVersionSelect,
   } = useContentContext();
 
-  if (!activeBlock.has_older_versions && versions.length === 0) {
-    return null;
-  }
+  const hasNoVersions =
+    !activeBlock.has_older_versions && versions.length === 0;
+  const isDisabled = hasNoVersions || isLoadingList || isFetchingText;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -33,33 +34,40 @@ export default function ContentToolbar() {
   };
 
   return (
-    <Select
-      value={displayedBlock.version_id?.toString()}
-      onValueChange={handleVersionSelect}
-    >
-      <SelectTrigger
-        className="w-45 h-8 text-xs bg-secondary text-secondary-foreground border-none rounded-full flex gap-2 disabled:opacity-50"
-        disabled={isLoadingList || isFetchingText}
-      >
-        {isFetchingText ? (
-          <Loader2 className="w-3.5 h-3.5 text-secondary-foreground animate-spin" />
-        ) : (
-          <History className="w-3.5 h-3.5 text-secondary-foreground" />
-        )}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          className="w-8 h-8 p-5 rounded-sm"
+          disabled={isDisabled}
+        >
+          {isFetchingText ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <History className="w-4 h-4" />
+          )}
+          <span className="sr-only">Version History</span>
+        </Button>
+      </DropdownMenuTrigger>
 
-        <SelectValue
-          placeholder={isLoadingList ? "Loading..." : "Select version"}
-        />
-      </SelectTrigger>
-      <SelectContent>
-        {versions.map((v) => (
-          <SelectItem key={v.version_id} value={v.version_id.toString()}>
-            {v.is_active
-              ? `${formatDate(v.accepted_at)} (Current)`
-              : `${formatDate(v.accepted_at)}`}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+      <DropdownMenuContent align="start">
+        <DropdownMenuRadioGroup
+          value={displayedBlock.version_id?.toString()}
+          onValueChange={handleVersionSelect}
+        >
+          {versions.map((v) => (
+            <DropdownMenuRadioItem
+              key={v.version_id}
+              value={v.version_id.toString()}
+            >
+              {v.is_active
+                ? `${formatDate(v.accepted_at)} (Current)`
+                : `${formatDate(v.accepted_at)}`}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
