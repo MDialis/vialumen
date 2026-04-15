@@ -100,7 +100,7 @@ export async function getOfficialSubthemeVersionList(
   }
 }
 
-export async function getSpecificVersion(id: string): Promise<VersionBlockResponse | null> {
+export async function getSpecificVersion(id: number): Promise<VersionBlockResponse | null> {
   try {
     const response = await fetch(
       `${API}/version/${id}`,
