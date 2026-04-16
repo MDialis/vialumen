@@ -52,7 +52,7 @@ export default async function Home() {
           <InputGroup className="bg-card">
             <InputGroupInput placeholder="Type to search..." />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton variant="secondary">Search</InputGroupButton>
+              <InputGroupButton variant="ghost" className="bg-background">Search</InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>

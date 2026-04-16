@@ -7,6 +7,7 @@ import {
   InputGroupInput,
 } from "./ui/input-group";
 import Link from "next/link";
+import AppearanceSettings from "./appearance-settings";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -34,13 +35,14 @@ export default function Navbar() {
           <InputGroup className="bg-muted text-muted-foreground">
             <InputGroupInput placeholder="Type to search..." />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton variant="secondary">Search</InputGroupButton>
+              <InputGroupButton variant="ghost" className="bg-background">Search</InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>
 
         <div className="flex-1 flex justify-end">
           <ThemeSwitcher className="text-constant-white" />
+          <AppearanceSettings />
         </div>
       </div>
     </nav>
