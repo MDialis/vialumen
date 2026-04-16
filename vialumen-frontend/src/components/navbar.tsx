@@ -41,7 +41,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex-1 flex justify-end">
-          <ThemeSwitcher className="text-constant-white" />
           <AppearanceSettings />
         </div>
       </div>

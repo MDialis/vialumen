@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { twMerge } from "tailwind-merge";
 
 type ThemeSwitcherProps = {
@@ -19,29 +20,25 @@ export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
   }, []);
 
   if (!mounted) {
-    // Return a placeholder with the same size to prevent layout shift
+    // Return a placeholder
     return <div className={twMerge("h-6 w-6", className)} />;
   }
 
-  const cycleTheme = () => {
-    // If the current resolved theme is dark, switch to light, otherwise dark
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <button
-      aria-label="Toggle Theme"
-      onClick={cycleTheme}
-      className={twMerge(
-        "rounded-full p-2 transition-colors hover:bg-accent hover:text-accent-foreground",
-        className
-      )}
-    >
-      {resolvedTheme === "dark" ? (
-        <Moon className="h-6 w-6" />
-      ) : (
-        <Sun className="h-6 w-6" />
-      )}
-    </button>
+    <div className="flex items-center gap-2">
+      <Sun 
+        className={`h-5 w-5 transition-colors ${!isDark ? "text-foreground" : "text-muted-foreground"}`} 
+      />
+      <Switch
+        id="theme-toggle"
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+      />
+      <Moon 
+        className={`h-5 w-5 transition-colors ${isDark ? "text-foreground" : "text-muted-foreground"}`} 
+      />
+    </div>
   );
 };

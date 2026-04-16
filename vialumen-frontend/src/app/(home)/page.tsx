@@ -1,7 +1,7 @@
 import { getHierarchyLevels } from "@/lib/api";
 import { HierarchyLevel } from "@/types";
 
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import AppearanceSettings from "@/components/appearance-settings"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -60,7 +60,7 @@ export default async function Home() {
         <div className="flex gap-2">
           <Button>Start now</Button>
           <Button variant="ghost">Know more</Button>
-          <ThemeSwitcher />
+          <AppearanceSettings />
         </div>
       </div>
 

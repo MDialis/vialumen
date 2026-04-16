@@ -1,20 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Settings2, Type, MonitorSmartphone, Moon, Palette, Plus } from "lucide-react";
+import { Type, MonitorSmartphone, Palette, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link"; 
+import { ThemeSwitcher } from "@/components/theme-switcher"; 
 
 const FONTS = [
   { id: "sans", label: "Sans-serif", cssClass: "font-sans" },
@@ -34,7 +33,6 @@ const THEMES = [
 export default function AppearanceSettings() {
   const [fontSize, setFontSize] = useState<number[]>([16]);
   const [fontFamily, setFontFamily] = useState<string>("sans");
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [activeTheme, setActiveTheme] = useState<string>("default");
 
   return (
@@ -58,7 +56,7 @@ export default function AppearanceSettings() {
         </div>
 
         {/* SCROLLABLE MIDDLE SECTION */}
-        <div className="flex-1 py-6 overflow-y-auto px-6 space-y-10">
+        <div className="flex-1 overflow-y-auto px-6 py-8 space-y-10">
           
           {/* --- SETTING: FONT SIZE --- */}
           <div className="space-y-4">
@@ -116,15 +114,10 @@ export default function AppearanceSettings() {
           {/* --- SETTING: THEME TOGGLE --- */}
           <div className="space-y-4 border-t border-border/50 pt-8">
             <div className="flex items-center justify-between">
-              <Label htmlFor="dark-mode-toggle" className="flex items-center gap-2 text-base font-semibold cursor-pointer">
-                <Moon className="w-4 h-4 text-muted-foreground" />
-                Dark Mode
+              <Label htmlFor="theme-toggle" className="text-base font-semibold cursor-pointer">
+                Theme Mode <span className="text-muted-foreground text-xs">(Light/Dark)</span>
               </Label>
-              <Switch 
-                id="dark-mode-toggle"
-                checked={isDarkMode} 
-                onCheckedChange={setIsDarkMode} 
-              />
+              <ThemeSwitcher />
             </div>
           </div>
 
