@@ -21,6 +21,9 @@ const FONTS = [
   { id: "sans", label: "Sans-serif", cssClass: "font-sans" },
   { id: "serif", label: "Serif", cssClass: "font-serif" },
   { id: "mono", label: "Monospace", cssClass: "font-mono" },
+  { id: "poppins", label: "Poppins", cssClass: "font-poppins" },
+  { id: "nunito", label: "Nunito", cssClass: "font-nunito" },
+  { id: "playfair", label: "Playfair", cssClass: "font-playfair" },
 ];
 
 const THEMES = [
@@ -33,8 +36,7 @@ const THEMES = [
 ];
 
 export default function AppearanceSettings() {
-  const { fontSize, setFontSize } = useFont();
-  const [fontFamily, setFontFamily] = useState<string>("sans");
+  const { fontSize, setFontSize, fontFamily, setFontFamily } = useFont();
   const [activeTheme, setActiveTheme] = useState<string>("default");
 
   return (
@@ -92,7 +94,7 @@ export default function AppearanceSettings() {
           <div className="space-y-4">
             <Label className="flex items-center gap-2 text-base font-semibold mb-4">
               <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
-              Font Family
+              Text Font
             </Label>
 
             <div className="grid grid-cols-3 gap-3">

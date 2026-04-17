@@ -64,6 +64,13 @@
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-serif: var(--font-lora), ui-serif, Georgia;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular;
+  --font-poppins: var(--font-poppins), sans-serif;
+  --font-playfair: var(--font-playfair), serif;
+  --font-nunito: var(--font-nunito), sans-serif;
 }
 
 :root {
@@ -538,6 +545,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
