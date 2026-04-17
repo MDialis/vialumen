@@ -9,19 +9,24 @@ interface GraphNodeProps {
 }
 
 export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNodeProps) => {
-  const clickStartPos = useRef({ x: 0, y: 0 });
+  const clickData = useRef({ x: 0, y: 0, time: 0 });
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    clickStartPos.current = { x: e.clientX, y: e.clientY };
+    clickData.current = {
+      x: e.clientX,
+      y: e.clientY,
+      time: Date.now()
+    };
 
     onPointerDown(e, node);
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    const dx = Math.abs(e.clientX - clickStartPos.current.x);
-    const dy = Math.abs(e.clientY - clickStartPos.current.y);
+    const dx = Math.abs(e.clientX - clickData.current.x);
+    const dy = Math.abs(e.clientY - clickData.current.y);
+    const dt = Date.now() - clickData.current.time;
 
-    if (dx > 5 || dy > 5) {
+    if (dx > 15 || dy > 15 || dt > 250) {
       e.preventDefault();
       return;
     }
