@@ -5,13 +5,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Type, MonitorSmartphone, Palette, Plus } from "lucide-react";
+import { Type, MonitorSmartphone, Palette, Plus, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -45,14 +46,22 @@ export default function AppearanceSettings() {
       </SheetTrigger>
 
       <SheetContent className="w-100 sm:w-135 flex flex-col p-0">
+
         {/* PINNED HEADER */}
-        <div className="border-b border-border/50 bg-background shrink-0 relative z-10">
-          <SheetHeader className="text-left">
+        <div className="flex items-center justify-between border-b border-border/50 bg-background shrink-0 relative z-10">
+          <SheetHeader className="text-left space-y-0">
             <SheetTitle className="flex items-center gap-2 text-2xl font-bold">
               <Palette className="w-6 h-6 text-primary" />
               Appearance
             </SheetTitle>
           </SheetHeader>
+
+          <SheetClose asChild>
+            <Button variant="ghost" size="icon" className="mr-4 rounded-full hover:bg-muted">
+              <X className="w-4 h-4 text-muted-foreground" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </SheetClose>
         </div>
 
         {/* SCROLLABLE MIDDLE SECTION */}
@@ -94,11 +103,10 @@ export default function AppearanceSettings() {
                   <button
                     key={font.id}
                     onClick={() => setFontFamily(font.id)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${
-                      isActive
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
-                    }`}
+                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${isActive
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
+                      }`}
                   >
                     <span className="text-4xl font-medium leading-none">
                       Aa
@@ -122,7 +130,7 @@ export default function AppearanceSettings() {
                 className="text-base font-semibold cursor-pointer"
               >
                 Theme Mode
-                <span className="text-muted-foreground text-xs">
+                <span className="text-muted-foreground text-xs ml-1">
                   (Light/Dark)
                 </span>
               </Label>
@@ -145,11 +153,10 @@ export default function AppearanceSettings() {
                   <button
                     key={theme.id}
                     onClick={() => setActiveTheme(theme.id)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-3 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      isActive
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
-                    }`}
+                    className={`flex flex-col items-center justify-center aspect-square gap-3 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${isActive
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
+                      }`}
                   >
                     <div
                       className={`w-6 h-6 rounded-full shadow-sm ${theme.color}`}
