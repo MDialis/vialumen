@@ -1,7 +1,6 @@
 "use client";
 
 import { useFont } from "@/contexts/font-provider";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -76,11 +75,11 @@ export default function AppearanceSettings() {
         </div>
 
         {/* SCROLLABLE MIDDLE SECTION */}
-        <div className="flex-1 overflow-y-auto px-6 py-8 space-y-10">
+        <div className="flex-1 overflow-y-auto px-6 py-8 space-y-5">
           {/* --- SETTING: FONT SIZE --- */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2 text-base font-semibold">
+              <Label className="flex items-center text-base font-semibold">
                 <Type className="w-4 h-4 text-muted-foreground" />
                 Base Font Size
               </Label>
@@ -95,18 +94,17 @@ export default function AppearanceSettings() {
               max={24}
               min={12}
               step={1}
-              className="py-4"
             />
           </div>
 
           {/* --- SETTING: FONT FAMILY --- */}
           <div className="space-y-4">
-            <Label className="flex items-center gap-2 text-base font-semibold mb-4">
+            <Label className="flex items-center text-base font-semibold mb-4">
               <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
               Text Font
             </Label>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {FONTS.map((font) => {
                 const isActive = fontFamily === font.id;
 
@@ -114,7 +112,7 @@ export default function AppearanceSettings() {
                   <button
                     key={font.id}
                     onClick={() => setFontFamily(font.id)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${
+                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-2 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${
                       isActive
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
@@ -134,29 +132,30 @@ export default function AppearanceSettings() {
             </div>
           </div>
 
-          {/* --- SETTING: THEME TOGGLE --- */}
-          <div className="space-y-4 border-t border-border/50 pt-8">
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="theme-toggle"
-                className="text-base font-semibold cursor-pointer"
-              >
-                Theme Mode
-                <span className="text-muted-foreground text-xs ml-1">
-                  (Light/Dark)
-                </span>
-              </Label>
-              <ThemeSwitcher />
-            </div>
-          </div>
-
           {/* --- SETTING: THEMES AND COLORS --- */}
           <div className="space-y-4">
-            <Label className="flex items-center gap-2 text-base font-semibold mb-4">
+            <Label className="flex items-center gap-2 text-base font-semibold">
               <Palette className="w-4 h-4 text-muted-foreground" />
               Themes and Colors
             </Label>
 
+            {/* --- THEME TOGGLE --- */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="theme-toggle"
+                  className="text-base font-semibold cursor-pointer"
+                >
+                  Theme Mode
+                  <span className="text-muted-foreground text-xs ml-1">
+                    (Light/Dark)
+                  </span>
+                </Label>
+                <ThemeSwitcher />
+              </div>
+            </div>
+
+            {/* --- THEME PRESETS --- */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {THEMES.map((theme) => {
                 const isActive = mode === theme.id;
@@ -165,14 +164,14 @@ export default function AppearanceSettings() {
                   <button
                     key={theme.id}
                     onClick={() => setMode(theme.id as ThemeMode)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-3 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-2 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       isActive
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
                     }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full shadow-sm ${
+                      className={`w-8 h-8 rounded-full shadow-sm ${
                         theme.customColor
                           ? theme.customColor
                           : `${theme.id}-theme bg-primary`
