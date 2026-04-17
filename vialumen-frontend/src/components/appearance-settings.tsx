@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { useAppTheme, ThemeMode } from "@/contexts/theme-provider";
 
 const FONTS = [
   { id: "sans", label: "Sans-serif", cssClass: "font-sans" },
@@ -27,17 +28,22 @@ const FONTS = [
 ];
 
 const THEMES = [
-  { id: "default", label: "Default", color: "bg-zinc-500" },
-  { id: "physiology", label: "Physiology", color: "bg-red-500" },
-  { id: "safety", label: "Safety", color: "bg-blue-700" },
-  { id: "belonging", label: "Belonging", color: "bg-amber-400" },
-  { id: "esteem", label: "Esteem", color: "bg-purple-600" },
-  { id: "actualization", label: "Actualization", color: "bg-cyan-400" },
+  {
+    id: "auto",
+    label: "Auto",
+    customColor: "bg-linear-to-br from-sky-600 via-purple-500 to-pink-500",
+  },
+  { id: "common", label: "Common", customColor: "bg-zinc-500" },
+  { id: "physiology", label: "Physiology" },
+  { id: "safety", label: "Safety" },
+  { id: "belonging", label: "Belonging" },
+  { id: "esteem", label: "Esteem" },
+  { id: "actualization", label: "Actualization" },
 ];
 
 export default function AppearanceSettings() {
   const { fontSize, setFontSize, fontFamily, setFontFamily } = useFont();
-  const [activeTheme, setActiveTheme] = useState<string>("default");
+  const { mode, setMode } = useAppTheme();
 
   return (
     <Sheet>
@@ -48,7 +54,6 @@ export default function AppearanceSettings() {
       </SheetTrigger>
 
       <SheetContent className="w-100 sm:w-135 flex flex-col p-0">
-
         {/* PINNED HEADER */}
         <div className="flex items-center justify-between border-b border-border/50 bg-background shrink-0 relative z-10">
           <SheetHeader className="text-left space-y-0">
@@ -59,7 +64,11 @@ export default function AppearanceSettings() {
           </SheetHeader>
 
           <SheetClose asChild>
-            <Button variant="ghost" size="icon" className="mr-4 rounded-full hover:bg-muted">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="mr-4 rounded-full hover:bg-muted"
+            >
               <X className="w-4 h-4 text-muted-foreground" />
               <span className="sr-only">Close</span>
             </Button>
@@ -105,10 +114,11 @@ export default function AppearanceSettings() {
                   <button
                     key={font.id}
                     onClick={() => setFontFamily(font.id)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${isActive
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
-                      }`}
+                    className={`flex flex-col items-center justify-center aspect-square gap-2 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${font.cssClass} ${
+                      isActive
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
+                    }`}
                   >
                     <span className="text-4xl font-medium leading-none">
                       Aa
@@ -149,19 +159,24 @@ export default function AppearanceSettings() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {THEMES.map((theme) => {
-                const isActive = activeTheme === theme.id;
+                const isActive = mode === theme.id;
 
                 return (
                   <button
                     key={theme.id}
-                    onClick={() => setActiveTheme(theme.id)}
-                    className={`flex flex-col items-center justify-center aspect-square gap-3 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${isActive
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
-                      }`}
+                    onClick={() => setMode(theme.id as ThemeMode)}
+                    className={`flex flex-col items-center justify-center aspect-square gap-3 p-4 rounded-xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      isActive
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/50 bg-transparent text-muted-foreground hover:bg-muted hover:border-border"
+                    }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full shadow-sm ${theme.color}`}
+                      className={`w-6 h-6 rounded-full shadow-sm ${
+                        theme.customColor
+                          ? theme.customColor
+                          : `${theme.id}-theme bg-primary`
+                      }`}
                     />
                     <span
                       className={`text-xs font-medium ${isActive ? "font-bold" : ""}`}

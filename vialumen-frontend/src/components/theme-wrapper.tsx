@@ -1,15 +1,36 @@
 "use client";
 
+import { useEffect, Suspense } from "react";
+import { useAppTheme, HIERARCHIES, HierarchyMode } from "@/contexts/theme-provider";
 import { useSearchParams } from "next/navigation";
-import { ReactNode } from "react";
 
-export function ThemeWrapper({ children }: { children: ReactNode }) {
+function ThemeQueryParamsLogic({ children }: { children: React.ReactNode }) {
+  const { setCurrentHierarchy } = useAppTheme();
   const searchParams = useSearchParams();
-  const themeParam = searchParams.get("theme") || "";
-  
+
+  useEffect(() => {
+    const themeQuery = searchParams.get("theme");
+
+    const isValidHierarchy = (HIERARCHIES as readonly string[]).includes(themeQuery || "");
+
+    if (isValidHierarchy) {
+      setCurrentHierarchy(themeQuery as HierarchyMode);
+    } else {
+      setCurrentHierarchy(null);
+    }
+
+    return () => setCurrentHierarchy(null);
+  }, [searchParams, setCurrentHierarchy]);
+
+  return <>{children}</>;
+}
+
+export function ThemeWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${themeParam}-theme`}>
-      {children}
-    </div>
+    <Suspense fallback={<>{children}</>}>
+      <ThemeQueryParamsLogic>
+        {children}
+      </ThemeQueryParamsLogic>
+    </Suspense>
   );
 }
