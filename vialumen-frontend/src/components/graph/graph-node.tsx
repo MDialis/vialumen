@@ -61,10 +61,10 @@ export const GraphNode = ({ node, onClick, onPointerDown, onPointerUp }: GraphNo
         textAnchor="middle"
         fill="var(--foreground)"
         className="
-            text-xs font-medium 
-            pointer-events-none select-none 
-            transition-all duration-300 
-            group-hover:font-bold group-hover:scale-115"
+          text-xs font-medium 
+          pointer-events-none select-none 
+          transition-all duration-300 
+          group-hover:font-bold group-hover:scale-115"
       >
         {node.title}
       </text>
