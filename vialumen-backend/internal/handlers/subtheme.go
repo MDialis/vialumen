@@ -77,9 +77,11 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 	edgesQuery := `
 		SELECT sc.source_subtheme_id, sc.target_subtheme_id
 		FROM subtheme_connections sc
-		JOIN subtheme_hierarchies sh ON sc.source_subtheme_id = sh.subtheme_id
-		WHERE sh.hierarchy_id = $1
+		JOIN subtheme_hierarchies sh1 ON sc.source_subtheme_id = sh1.subtheme_id
+		JOIN subtheme_hierarchies sh2 ON sc.target_subtheme_id = sh2.subtheme_id
+		WHERE sh1.hierarchy_id = $1 AND sh2.hierarchy_id = $1
 	`
+
 	edgeRows, err := h.DB.Query(edgesQuery, hierarchyID)
 	if err != nil {
 		log.Printf("Error querying connections: %v", err)

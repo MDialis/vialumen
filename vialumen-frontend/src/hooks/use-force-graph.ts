@@ -22,14 +22,18 @@ export interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
 export function useForceGraph(data: HierarchyGraphResponse) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
+  const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(
+    null,
+  );
   const draggedNodeRef = useRef<GraphNode | null>(null);
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [animatedNodes, setAnimatedNodes] = useState<GraphNode[]>([]);
   const [animatedLinks, setAnimatedLinks] = useState<GraphLink[]>([]);
 
-  const [transform, setTransform] = useState<d3Zoom.ZoomTransform>(d3Zoom.zoomIdentity);
+  const [transform, setTransform] = useState<d3Zoom.ZoomTransform>(
+    d3Zoom.zoomIdentity,
+  );
   const transformRef = useRef(d3Zoom.zoomIdentity);
 
   // --- Container Measurement ---
@@ -58,12 +62,13 @@ export function useForceGraph(data: HierarchyGraphResponse) {
     const inDegree = new Map<number, number>();
     const adjList = new Map<number, number[]>();
 
-    data.nodes.forEach(n => {
-      inDegree.set(n.id, 0);
-      adjList.set(n.id, []);
+    data.nodes.forEach((n) => {
+      const numericId = Number(n.id); // Normalize ID to Number
+      inDegree.set(numericId, 0);
+      adjList.set(numericId, []);
     });
 
-    data.edges.forEach(edge => {
+    data.edges.forEach((edge) => {
       inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
       adjList.get(edge.source)?.push(edge.target);
     });
@@ -71,14 +76,15 @@ export function useForceGraph(data: HierarchyGraphResponse) {
     // Initialize nodes with default values
     const nodesMap = new Map<number, GraphNode>();
     const nodes: GraphNode[] = data.nodes.map((n) => {
-      const node = { ...n, depth: 0, radius: 12 };
-      nodesMap.set(n.id, node);
+      const node = { ...n, id: Number(n.id), depth: 0, radius: 12 };
+      nodesMap.set(node.id, node);
       return node;
     });
 
     // Calculate Depth using Breadth-First Search (Queue)
-    // Find all nodes with 0 incoming edges (the roots)
-    const queue = data.nodes.filter(n => inDegree.get(n.id) === 0).map(n => n.id);
+    const queue = nodes
+      .filter((n) => inDegree.get(n.id) === 0)
+      .map((n) => n.id);
     const visited = new Set<number>();
 
     while (queue.length > 0) {
@@ -89,11 +95,11 @@ export function useForceGraph(data: HierarchyGraphResponse) {
         const currentNode = nodesMap.get(currentId)!;
 
         // Calculate dynamic radius based on depth
-        currentNode.radius = Math.max(8, 32 - (currentNode.depth! * 8));  // e.g., Depth 0 = 32px, Depth 1 = 24px, Depth 2 = 16px, minimum 8px
+        currentNode.radius = Math.max(8, 32 - currentNode.depth! * 8); // e.g., Depth 0 = 32px, Depth 1 = 24px, Depth 2 = 16px, minimum 8px
 
         // Add children to queue and assign them depth + 1
         const children = adjList.get(currentId) || [];
-        children.forEach(childId => {
+        children.forEach((childId) => {
           if (!visited.has(childId)) {
             const childNode = nodesMap.get(childId)!;
             childNode.depth = currentNode.depth! + 1;
@@ -108,10 +114,19 @@ export function useForceGraph(data: HierarchyGraphResponse) {
 
     const simulation = d3
       .forceSimulation<GraphNode, GraphLink>(nodes)
-      .force("link", d3.forceLink<GraphNode, GraphLink>(links).id((d) => d.id).distance(150))
+      .force(
+        "link",
+        d3
+          .forceLink<GraphNode, GraphLink>(links)
+          .id((d) => d.id)
+          .distance(150),
+      )
       .force("charge", d3.forceManyBody().strength(-650))
       .force("center", d3.forceCenter(centerX, centerY))
-      .force("collide", d3.forceCollide<GraphNode>().radius(d => (d.radius || 16) + 20))
+      .force(
+        "collide",
+        d3.forceCollide<GraphNode>().radius((d) => (d.radius || 16) + 20),
+      )
       .on("tick", () => {
         // Sync D3's internal state with React state on every frame
         setAnimatedNodes([...nodes]);
@@ -155,12 +170,15 @@ export function useForceGraph(data: HierarchyGraphResponse) {
   }, []);
 
   // --- Drag Interactions ---
-  const onPointerDown = useCallback((e: React.PointerEvent, node: GraphNode) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    draggedNodeRef.current = node;
-    node.fx = node.x;
-    node.fy = node.y;
-  }, []);
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent, node: GraphNode) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      draggedNodeRef.current = node;
+      node.fx = node.x;
+      node.fy = node.y;
+    },
+    [],
+  );
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     const container = containerRef.current;
