@@ -1,7 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./base.css";
-@import "./themes.css";
+
+@import "./themes/physiology.css";
+@import "./themes/safety.css";
+@import "./themes/belonging.css";
+@import "./themes/esteem.css";
+@import "./themes/actualization.css";
+@import "./themes/premiumtest.css";
 
 @custom-variant dark (&:is(.dark *));
 
