@@ -3,17 +3,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export const HIERARCHIES = ["physiology", "safety", "belonging", "esteem", "actualization"] as const;
-export type HierarchyMode = typeof HIERARCHIES[number];
-export type ThemeMode = "auto" | "common" | HierarchyMode;
-
-const HIERARCHY_CLASSES = HIERARCHIES.map((h) => `${h}-theme`);
+export type ThemeMode = "auto" | "common" | string;
 
 type ThemeContextType = {
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
-  currentHierarchy: HierarchyMode | null;
-  setCurrentHierarchy: (h: HierarchyMode | null) => void;
+  currentHierarchy: string | null; 
+  setCurrentHierarchy: (h: string | null) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -22,12 +18,12 @@ type ThemeProviderProps = React.ComponentProps<typeof NextThemesProvider>;
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const [mode, setMode] = useState<ThemeMode>("auto");
-  const [currentHierarchy, setCurrentHierarchy] = useState<HierarchyMode | null>(null);
+  const [currentHierarchy, setCurrentHierarchy] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     Promise.resolve().then(() => {
-      const saved = localStorage.getItem("app-theme-mode") as ThemeMode | null;
+      const saved = localStorage.getItem("app-theme-mode");
       if (saved) {
         setMode(saved);
       }
@@ -39,7 +35,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     if (!isMounted) return; 
 
     const body = document.body;
-    body.classList.remove(...HIERARCHY_CLASSES);
+    
+    const classesToRemove = Array.from(body.classList).filter(className => 
+      className.endsWith('-theme')
+    );
+    if (classesToRemove.length > 0) {
+      body.classList.remove(...classesToRemove);
+    }
 
     let themeToApply = "";
 

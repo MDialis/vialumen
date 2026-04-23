@@ -1,4 +1,3 @@
-import { ThemeSwitcher } from "./theme-switcher";
 import { Fredoka } from "next/font/google";
 import {
   InputGroup,

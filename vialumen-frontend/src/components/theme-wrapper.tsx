@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, Suspense } from "react";
-import { useAppTheme, HIERARCHIES, HierarchyMode } from "@/contexts/theme-provider";
+import { useAppTheme } from "@/contexts/theme-provider";
 import { useSearchParams } from "next/navigation";
 
 function ThemeQueryParamsLogic({ children }: { children: React.ReactNode }) {
@@ -11,10 +11,8 @@ function ThemeQueryParamsLogic({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const themeQuery = searchParams.get("theme");
 
-    const isValidHierarchy = (HIERARCHIES as readonly string[]).includes(themeQuery || "");
-
-    if (isValidHierarchy) {
-      setCurrentHierarchy(themeQuery as HierarchyMode);
+    if (themeQuery) {
+      setCurrentHierarchy(themeQuery);
     } else {
       setCurrentHierarchy(null);
     }

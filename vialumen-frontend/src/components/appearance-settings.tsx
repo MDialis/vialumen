@@ -44,6 +44,7 @@ const THEMES = [
   { id: "belonging", label: "Belonging" },
   { id: "esteem", label: "Esteem" },
   { id: "actualization", label: "Actualization" },
+  { id: "premiumtest", label: "Premium Test", customColor: "bg-zinc-950 border border-yellow-600/50" },
 ];
 
 export default function AppearanceSettings() {
