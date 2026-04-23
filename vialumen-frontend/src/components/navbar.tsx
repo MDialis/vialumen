@@ -7,6 +7,7 @@ import {
 } from "./ui/input-group";
 import Link from "next/link";
 import AppearanceSettings from "./appearance-settings";
+import UserButton from "./user-button";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -17,7 +18,7 @@ const fredoka = Fredoka({
 export default function Navbar() {
   return (
     <nav
-      className={`sticky top-0 w-full bg-constant-black ${fredoka.variable}`}
+      className={`sticky top-0 z-50 w-full bg-constant-black ${fredoka.variable}`}
     >
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
         <div className="flex-1 flex justify-start">
@@ -39,8 +40,9 @@ export default function Navbar() {
           </InputGroup>
         </div>
 
-        <div className="flex-1 flex justify-end">
+        <div className="flex-1 flex justify-end items-center gap-4">
           <AppearanceSettings />
+          <UserButton />
         </div>
       </div>
     </nav>
