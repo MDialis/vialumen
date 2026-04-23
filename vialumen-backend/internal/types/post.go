@@ -17,13 +17,13 @@ type CommunityPost struct {
 type PostContributor struct {
 	ID               int     `json:"id"`
 	PostID           int     `json:"post_id"`
-	UserID           *int    `json:"user_id"`
+	UserID           *string `json:"user_id"`
 	ExternalName     *string `json:"external_name"`
 	ContributionRole string  `json:"contribution_role"`
 }
 
 type SubmissionVote struct {
-	PostID    int `json:"post_id"`
-	UserID    int `json:"user_id"`
-	VoteValue int `json:"vote_value"` // smallint maps to int in Go
+	PostID    int    `json:"post_id"`
+	UserID    string `json:"user_id"`
+	VoteValue int    `json:"vote_value"` // smallint maps to int in Go
 }

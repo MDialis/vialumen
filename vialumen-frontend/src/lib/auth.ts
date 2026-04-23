@@ -60,9 +60,4 @@ export const auth = betterAuth({
     plugins: [
         passkey(),
     ],
-    advanced: {
-        database: {
-            generateId: false,
-        }
-    }
 });

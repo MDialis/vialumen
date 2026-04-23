@@ -34,7 +34,7 @@ type CreateOfficialVersionRequest struct {
 }
 
 type ContributorRequest struct {
-	UserID       *int    `json:"user_id"`       // Nullable (if it's an external expert)
+	UserID       *string `json:"user_id"`       // Nullable (if it's an external expert)
 	ExternalName *string `json:"external_name"` // Nullable (if it's a registered user)
 	Role         string  `json:"role"`
 }
@@ -47,7 +47,7 @@ type SourceRequest struct {
 
 // HTTP Response DTOs
 type SubthemeResponse struct {
-	ID          int       `json:"id"`
+	ID          string    `json:"id"`
 	Title       string    `json:"title"`
 	Slug        string    `json:"slug"`
 	Description string    `json:"description"`

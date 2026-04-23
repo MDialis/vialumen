@@ -16,7 +16,7 @@ type OfficialVersion struct {
 type OfficialContributor struct {
 	ID               int     `json:"id"`
 	VersionID        int     `json:"version_id"`
-	UserID           *int    `json:"user_id"`
+	UserID           *string `json:"user_id"`
 	ExternalName     *string `json:"external_name"`
 	ContributionRole string  `json:"contribution_role"`
 }

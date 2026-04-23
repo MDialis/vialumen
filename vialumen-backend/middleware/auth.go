@@ -24,7 +24,7 @@ func AuthMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 
 			// Query the PostgreSQL session table
 			var sessionID string
-			var userID int
+			var userID string
 			var expiresAt time.Time
 
 			// Better-Auth stores the token directly in the 'token' column
