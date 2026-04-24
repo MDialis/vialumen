@@ -57,6 +57,7 @@ export const auth = betterAuth({
         gitlab: { clientId: process.env.GITLAB_CLIENT_ID!, clientSecret: process.env.GITLAB_CLIENT_SECRET! },
         github: { clientId: process.env.GITHUB_CLIENT_ID!, clientSecret: process.env.GITHUB_CLIENT_SECRET! },
     },
+    /*
     databaseHooks: {
         user: {
             create: {
@@ -112,6 +113,7 @@ export const auth = betterAuth({
             },
         },
     },
+    */
     plugins: [
         passkey(),
     ],
