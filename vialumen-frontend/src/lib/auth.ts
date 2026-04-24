@@ -92,11 +92,13 @@ export const auth = betterAuth({
         before: async (user) => {
           // Create the clean base slug: "Mateus Diális" -> "mateus-dialis"
           const baseSlug = user.name
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]/g, "-") // Replace spaces/special chars with hyphens
-            .replace(/-+/g, "-") // Remove multiple consecutive hyphens
-            .replace(/^-|-$/g, ""); // Strip leading/trailing hyphens just in case
+            .normalize("NFD")                   // Separate letters from their accents (e.g., Á -> A + ´)
+            .replace(/[\u0300-\u036f]/g, "")    // Remove all those separated accent marks
+            .toLowerCase()                      // Convert everything to lowercase
+            .trim()                             // Remove outer spaces
+            .replace(/[^a-z0-9]/g, "-")         // Replace remaining spaces/symbols with hyphens
+            .replace(/-+/g, "-")                // Remove multiple consecutive hyphens
+            .replace(/^-|-$/g, "");             // Strip leading/trailing hyphens
 
           let finalUsername = baseSlug;
           let isAvailable = false;
