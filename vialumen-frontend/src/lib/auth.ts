@@ -20,10 +20,15 @@ export const auth = betterAuth({
     modelName: "users",
     fields: {
       emailVerified: "email_verified",
-      username: "username",
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
+    additionalFields: {
+      username: {
+        type: "string",
+        required: false,
+      }
+    }
   },
   session: {
     fields: {
