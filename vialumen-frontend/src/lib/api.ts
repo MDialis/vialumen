@@ -4,6 +4,7 @@ import {
   OfficialPageResponse,
   VersionBlockResponse,
   VersionMetaResponse,
+  PublicProfileResponse
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
@@ -116,6 +117,31 @@ export async function getSpecificVersion(id: number): Promise<VersionBlockRespon
     return await response.json();
   } catch (error) {
     console.error(`Network error when fetching version with id ${id}:`, error);
+    return null;
+  }
+}
+
+export async function getUserProfile(
+  username: string,
+): Promise<PublicProfileResponse | null> {
+  try {
+    const response = await fetch(`${API}/profile/${username}`, {
+      cache: 'no-store' 
+    });
+
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch profile for ${username}: ${response.status} ${response.statusText}`,
+      );
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(
+      `Network error when fetching profile for ${username}:`,
+      error,
+    );
     return null;
   }
 }

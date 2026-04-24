@@ -72,3 +72,10 @@ export interface VersionMetaResponse {
   accepted_at: string;
   is_active: boolean;
 }
+
+export interface PublicProfileResponse {
+  name: string;
+  username: string;
+  image: string | null;
+  createdAt: string;
+}
