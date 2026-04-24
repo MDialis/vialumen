@@ -30,7 +30,7 @@ export default function ProfilePage() {
     return null; 
   }
 
-  const { name, email, username } = session.user;
+  const { name, email } = session.user;
   
   // Grab the first two letters of the name for the avatar fallback
   const initials = name?.substring(0, 2).toUpperCase() || "US";
@@ -70,9 +70,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm font-medium leading-none">Username</p>
-                <p className="text-sm text-muted-foreground mt-1.5">
-                  {username || "Not set"}
-                </p>
+
               </div>
             </div>
 
