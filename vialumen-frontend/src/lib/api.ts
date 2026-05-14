@@ -7,6 +7,7 @@ import {
   PublicProfileResponse,
   SubthemeSimple,
   UserSearchResult,
+  CreateContentPayload
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
@@ -168,5 +169,26 @@ export async function getUserProfile(
       error,
     );
     return null;
+  }
+}
+
+export async function postOfficialContent(payload: CreateContentPayload): Promise<boolean> {
+  try {
+    const response = await fetch(`${API}/official-content`, { // Adjust endpoint route if needed
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      console.error(`Post failed: ${response.status} ${response.statusText}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Network error posting content:", error);
+    return false;
   }
 }
