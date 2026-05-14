@@ -4,10 +4,35 @@ import {
   OfficialPageResponse,
   VersionBlockResponse,
   VersionMetaResponse,
-  PublicProfileResponse
+  PublicProfileResponse,
+  SubthemeSimple,
+  UserSearchResult,
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
+
+export async function getSubthemes(): Promise<SubthemeSimple[] | null> {
+  try {
+    const response = await fetch(`${API}/subthemes`, { cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch subthemes:", error);
+    return null;
+  }
+}
+
+export async function searchUsers(query: string): Promise<UserSearchResult[]> {
+  if (!query.trim()) return [];
+  try {
+    const response = await fetch(`${API}/users/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (error) {
+    console.error("User search failed:", error);
+    return [];
+  }
+}
 
 export async function getHierarchyLevels(): Promise<HierarchyLevel[] | null> {
   try {
@@ -126,7 +151,7 @@ export async function getUserProfile(
 ): Promise<PublicProfileResponse | null> {
   try {
     const response = await fetch(`${API}/profile/${username}`, {
-      cache: 'no-store' 
+      cache: 'no-store'
     });
 
     if (!response.ok) {

@@ -27,6 +27,14 @@ export const auth = betterAuth({
       username: {
         type: "string",
         required: false,
+      },
+      role: {
+        type: "string",
+        defaultValue: "user",
+      },
+      badge: {
+        type: "string[]",
+        required: false,
       }
     }
   },

@@ -2,6 +2,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role: string
+  badge: string[] | null;
 }
 
 export interface HierarchyLevel {
@@ -78,4 +80,39 @@ export interface PublicProfileResponse {
   username: string;
   image: string | null;
   createdAt: string;
+  role: string
+  badge: string[] | null;
+}
+
+export interface SubthemeSimple {
+  id: number;
+  title: string;
+  slug: string;
+}
+
+export interface UserSearchResult {
+  id: string;
+  username: string;
+  name: string;
+}
+
+export interface ContributorPayload {
+  user_id: string | null;
+  external_name: string | null;
+  role: string;
+}
+
+export interface SourcePayload {
+  title: string;
+  url?: string;
+  source_type: string;
+}
+
+export interface CreateContentPayload {
+  subtheme_id: number;
+  content_type: string;
+  content_text: string;
+  is_active: boolean;
+  contributors: ContributorPayload[];
+  sources: SourcePayload[];
 }
