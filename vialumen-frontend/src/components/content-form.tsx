@@ -31,7 +31,6 @@ interface FormContributor {
   isSearching: boolean;
 }
 
-// 1. Added url to local state
 interface FormSource {
   title: string;
   source_type: string;
@@ -80,7 +79,7 @@ export default function OfficialContentForm({
     );
   };
 
-  // 2. Default url to an empty string on creation
+  // Default url to an empty string on creation
   const addSource = () => setSources((prev) => [...prev, { title: "", source_type: "", url: "" }]);
 
   const removeSource = (index: number) => setSources((prev) => prev.filter((_, i) => i !== index));
@@ -123,7 +122,7 @@ export default function OfficialContentForm({
         external_name: c.type === "external" ? c.external_name : null,
         role: c.role.trim() || "Author",
       })),
-      // 3. Map the URL cleanly, sending undefined if the string is empty
+      // Map the URL cleanly, sending undefined if the string is empty
       sources: sources
         .map((s) => ({
           title: s.title.trim(),
@@ -157,19 +156,25 @@ export default function OfficialContentForm({
       )}
       {status.success && (
         <div className="p-4 bg-primary/10 border border-primary text-primary rounded-md text-sm font-medium">
-          Content payload successfully deployed to matrix core!
+          Content successfully deployed!
         </div>
       )}
 
       {/* Primary Configuration */}
       <Card className="border-border bg-card shadow-sm">
-        <CardHeader><CardTitle>Matrix Parameters</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>
+            Subtheme & Content Data
+          </CardTitle>
+        </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase text-muted-foreground">Subtheme</label>
               <Select value={subthemeId} onValueChange={setSubthemeId}>
-                <SelectTrigger><SelectValue placeholder="Select target domain..." /></SelectTrigger>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select subtheme to update..." />
+                </SelectTrigger>
                 <SelectContent>
                   {initialSubthemes.map((t) => (
                     <SelectItem key={t.id} value={t.id.toString()}>{t.title}</SelectItem>
@@ -263,7 +268,7 @@ export default function OfficialContentForm({
         </CardContent>
       </Card>
 
-      {/* 4. Updated Dynamic Sources Block Layout */}
+      {/* Dynamic Sources Block Layout */}
       <Card className="border-border bg-card shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-4">
           <CardTitle className="text-xl">Citations</CardTitle>

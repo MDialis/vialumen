@@ -174,7 +174,7 @@ export async function getUserProfile(
 
 export async function postOfficialContent(payload: CreateContentPayload): Promise<boolean> {
   try {
-    const response = await fetch(`${API}/official-content`, { // Adjust endpoint route if needed
+    const response = await fetch(`${API}/content/post`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

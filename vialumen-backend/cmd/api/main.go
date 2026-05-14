@@ -53,7 +53,7 @@ func main() {
 
 	mux.HandleFunc("POST /api/subthemes", appHandler.CreateSubtheme)
 	mux.HandleFunc("POST /api/subthemes/connect", appHandler.ConnectSubthemes)
-	mux.HandleFunc("POST /api/official", appHandler.CreateOfficialVersion)
+	mux.HandleFunc("POST /api/content/post", appHandler.CreateOfficialVersion)
 
 	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
 	if allowedOrigin == "" {
