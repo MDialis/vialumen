@@ -9,6 +9,58 @@ import (
 	"github.com/MDialis/vialumen-backend/internal/types"
 )
 
+func (h *Handler) SearchAllUsers(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+
+	// EARLY EXIT: Save DB connections if the query is empty or too short
+	if len(query) < 2 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("[]"))
+		return
+	}
+
+	// Prepare search pattern for ILIKE (e.g., "%dia%")
+	searchPattern := "%" + query + "%"
+
+	// Strict LIMIT 10 ensures sub-millisecond execution times
+	sqlQuery := `
+		SELECT id, username, name 
+		FROM users 
+		WHERE username ILIKE $1 OR name ILIKE $1 
+		ORDER BY username ASC 
+		LIMIT 10
+	`
+
+	rows, err := h.DB.Query(sqlQuery, searchPattern)
+	if err != nil {
+		log.Printf("Error searching users: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	results := []types.UserListItem{}
+	for rows.Next() {
+		var u types.UserListItem
+		if err := rows.Scan(&u.ID, &u.Username, &u.Name); err != nil {
+			log.Printf("Error scanning user search row: %v", err)
+			continue
+		}
+		results = append(results, u)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("Error iterating user search rows: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(results)
+}
+
 // GetUserProfile fetches public profile data by username
 func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract the username from the URL

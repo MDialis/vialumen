@@ -41,6 +41,9 @@ func main() {
 
 	mux.HandleFunc("GET /api/health", handlers.HealthCheck)
 	mux.HandleFunc("GET /api/hierarchies", appHandler.GetHierarchyLevels)
+	mux.HandleFunc("GET /api/subthemes", appHandler.GetAllSubthemes)
+	mux.HandleFunc("GET /api/users/search", appHandler.SearchAllUsers)
+
 	mux.HandleFunc("GET /api/profile/{username}", appHandler.GetUserProfile)
 	//	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
 	mux.HandleFunc("GET /api/core/{id}", appHandler.GetSubthemesConnectionsByHierarchy)

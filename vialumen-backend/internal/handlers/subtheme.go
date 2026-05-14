@@ -41,6 +41,39 @@ func (h *Handler) fetchSubthemesHelper(hierarchyID string) ([]types.SubthemeResp
 }
 
 // ----- GET Functions -----
+func (h *Handler) GetAllSubthemes(w http.ResponseWriter, r *http.Request) {
+	query := `SELECT id, title, slug FROM subthemes ORDER BY title ASC`
+
+	rows, err := h.DB.Query(query)
+	if err != nil {
+		log.Printf("Error querying all subthemes: %v", err)
+		http.Error(w, "Failed to fetch subthemes", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	list := []types.SubthemeListItem{}
+
+	for rows.Next() {
+		var item types.SubthemeListItem
+		if err := rows.Scan(&item.ID, &item.Title, &item.Slug); err != nil {
+			log.Printf("Error scanning subtheme list row: %v", err)
+			continue
+		}
+		list = append(list, item)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("Error iterating subtheme list rows: %v", err)
+		http.Error(w, "Error processing data", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(list)
+}
+
 func (h *Handler) GetSubthemesByHierarchy(w http.ResponseWriter, r *http.Request) {
 	hierarchyID := r.PathValue("id")
 	if hierarchyID == "" {

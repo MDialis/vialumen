@@ -11,6 +11,12 @@ type Subtheme struct {
 	CreatedAt   *time.Time `json:"created_at"`
 }
 
+type SubthemeListItem struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
+	Slug  string `json:"slug"`
+}
+
 // HTTP Request DTOs
 type CreateSubthemeRequest struct {
 	Title        string   `json:"title"`
