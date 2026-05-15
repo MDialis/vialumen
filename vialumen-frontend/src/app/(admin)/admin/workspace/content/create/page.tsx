@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import NoCredentialsMessage from "@/components/not-admin-message";
 
-export default async function PostOfficialContentPage() {
+export default async function CreateOfficialContentPage() {
   // Secure Server-Side Auth Fetching
   const session = await auth.api.getSession({ headers: await headers() });
 

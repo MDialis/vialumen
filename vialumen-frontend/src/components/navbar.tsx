@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import AppearanceSettings from "./appearance-settings";
 import UserButton from "./user-button";
+import { LayoutDashboard } from "lucide-react";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -15,7 +16,11 @@ const fredoka = Fredoka({
   variable: "--font-fredoka",
 });
 
-export default function Navbar() {
+interface NavbarProps {
+  isAdmin?: boolean;
+}
+
+export default function Navbar({ isAdmin = false }: NavbarProps) {
   return (
     <nav
       className={`sticky top-0 z-50 w-full bg-constant-black ${fredoka.variable}`}
@@ -35,12 +40,23 @@ export default function Navbar() {
           <InputGroup className="bg-muted text-muted-foreground">
             <InputGroupInput placeholder="Type to search..." />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton variant="ghost" className="bg-background">Search</InputGroupButton>
+              <InputGroupButton variant="ghost" className="bg-background">
+                Search
+              </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>
 
         <div className="flex-1 flex justify-end items-center gap-4">
+          {isAdmin && (
+            <Link
+              href="/admin/workspace"
+              className="flex items-center gap-1.5 text-sm font-medium text-constant-white/80 hover:text-constant-white transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span className="hidden sm:inline-block"></span>
+            </Link>
+          )}
           <AppearanceSettings />
           <UserButton />
         </div>
