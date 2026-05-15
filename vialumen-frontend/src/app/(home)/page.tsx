@@ -34,7 +34,7 @@ export default async function Home() {
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-start bg-background text-foreground pt-32 px-1 gap-4 ${fredoka.variable}`}
+      className={`flex min-h-screen flex-col items-center justify-start bg-background text-foreground pt-12 px-1 gap-4 ${fredoka.variable}`}
     >
       <div className="pb-12 flex flex-col items-center max-w-6xl w-full gap-4">
         <div className="py-6">
@@ -55,12 +55,6 @@ export default async function Home() {
               <InputGroupButton variant="ghost" className="bg-background">Search</InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
-        </div>
-
-        <div className="flex gap-2">
-          <Button>Start now</Button>
-          <Button variant="ghost">Know more</Button>
-          <AppearanceSettings />
         </div>
       </div>
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { Fredoka } from "next/font/google";
 import {
   InputGroup,
@@ -9,6 +11,7 @@ import Link from "next/link";
 import AppearanceSettings from "./appearance-settings";
 import UserButton from "./user-button";
 import { LayoutDashboard } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -17,16 +20,19 @@ const fredoka = Fredoka({
 });
 
 interface NavbarProps {
-  isAdmin?: boolean;
+  transparent?: boolean;
 }
 
-export default function Navbar({ isAdmin = false }: NavbarProps) {
+export default function Navbar({ transparent = false }: NavbarProps) {
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
+
   return (
     <nav
-      className={`sticky top-0 z-50 w-full bg-constant-black ${fredoka.variable}`}
+      className={`top-0 z-50 w-full ${transparent ? "bg-transparent" : "sticky bg-constant-black"} ${fredoka.variable}`}
     >
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
-        <div className="flex-1 flex justify-start">
+        <div className={`flex-1 flex justify-start ${transparent ? "hidden" : ""}`}>
           <Link href="/" className="hover:opacity-85 px-2 py-1 rounded-lg">
             <h1
               className={`text-2xl font-semibold text-constant-white ${fredoka.className}`}
@@ -36,7 +42,7 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
           </Link>
         </div>
 
-        <div className="max-w-sm w-full">
+        <div className={`max-w-sm w-full ${transparent ? "hidden" : ""}`}>
           <InputGroup className="bg-muted text-muted-foreground">
             <InputGroupInput placeholder="Type to search..." />
             <InputGroupAddon align="inline-end">
@@ -54,7 +60,6 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
               className="flex items-center gap-1.5 text-sm font-medium text-constant-white/80 hover:text-constant-white transition-colors"
             >
               <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline-block"></span>
             </Link>
           )}
           <AppearanceSettings />

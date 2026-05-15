@@ -7,7 +7,7 @@ export default function CoreLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Navbar transparent />
 
       <main className="flex-1">
         {children}
