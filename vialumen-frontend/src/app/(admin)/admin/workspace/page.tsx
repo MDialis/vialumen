@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PenBox, Users, Inbox } from "lucide-react";
-import NoCredentialsMessage from "@/components/not-admin-message";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+//import NoCredentialsMessage from "@/components/not-admin-message";
+//import { auth } from "@/lib/auth";
+//import { headers } from "next/headers";
 
 export default async function AdminWorkspacePage() {
   // --- Auth Verification ---
+  /*
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
@@ -26,7 +27,7 @@ export default async function AdminWorkspacePage() {
       <NoCredentialsMessage />
     );
   }
-
+*/
   return (
     <ThemeWrapper>
       <div className="min-h-screen p-8 bg-background text-foreground">
