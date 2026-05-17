@@ -72,7 +72,7 @@ func main() {
 	// =========================
 	mux.Handle("POST /api/subthemes", authMiddleware(http.HandlerFunc(appHandler.CreateSubtheme)))
 	mux.Handle("POST /api/subthemes/connect", authMiddleware(http.HandlerFunc(appHandler.ConnectSubthemes)))
-	mux.Handle("POST /api/content/post", authMiddleware(http.HandlerFunc(appHandler.CreateOfficialVersion)))
+	mux.Handle("POST /api/admin/workspace/content/create", authMiddleware(http.HandlerFunc(appHandler.CreateOfficialVersion)))
 	mux.Handle("POST /api/community", authMiddleware(http.HandlerFunc(appHandler.CreateCommunityPost)))
 
 	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
