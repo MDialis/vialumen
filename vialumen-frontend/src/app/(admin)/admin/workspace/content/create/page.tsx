@@ -2,8 +2,13 @@ import { getSubthemes } from "@/lib/api";
 import OfficialContentForm from "@/components/content-form";
 import { ThemeWrapper } from "@/components/theme-wrapper";
 import { Separator } from "@/components/ui/separator";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default async function CreateOfficialContentPage() {
+export default async function PostOfficialContentPage() {
+  const sessionData = await auth.api.getSession({ headers: await headers() });
+  const token = sessionData?.session?.token || "";
+
   const subthemes = await getSubthemes();
 
   return (
@@ -20,7 +25,10 @@ export default async function CreateOfficialContentPage() {
           <Separator className="bg-border" />
 
           {/* Render the interactive client form */}
-          <OfficialContentForm initialSubthemes={subthemes || []} />
+          <OfficialContentForm
+            initialSubthemes={subthemes || []}
+            token={token}
+          />
         </div>
       </div>
     </ThemeWrapper>

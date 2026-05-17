@@ -39,8 +39,10 @@ interface FormSource {
 
 export default function OfficialContentForm({
   initialSubthemes,
+  token,
 }: {
   initialSubthemes: SubthemeSimple[];
+  token: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -79,7 +81,6 @@ export default function OfficialContentForm({
     );
   };
 
-  // Default url to an empty string on creation
   const addSource = () => setSources((prev) => [...prev, { title: "", source_type: "", url: "" }]);
 
   const removeSource = (index: number) => setSources((prev) => prev.filter((_, i) => i !== index));
@@ -122,7 +123,6 @@ export default function OfficialContentForm({
         external_name: c.type === "external" ? c.external_name : null,
         role: c.role.trim() || "Author",
       })),
-      // Map the URL cleanly, sending undefined if the string is empty
       sources: sources
         .map((s) => ({
           title: s.title.trim(),
@@ -133,7 +133,8 @@ export default function OfficialContentForm({
     };
 
     startTransition(async () => {
-      const success = await postOfficialContent(payload);
+      const success = await postOfficialContent(payload, token);
+
       if (success) {
         setStatus({ success: true });
         setContentText("");
