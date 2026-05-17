@@ -25,5 +25,22 @@ type PostContributor struct {
 type SubmissionVote struct {
 	PostID    int    `json:"post_id"`
 	UserID    string `json:"user_id"`
-	VoteValue int    `json:"vote_value"` // smallint maps to int in Go
+	VoteValue int    `json:"vote_value"`
+}
+
+type CreateCommunityPostRequest struct {
+	SubthemeID  int     `json:"subtheme_id"`
+	HierarchyID *string `json:"hierarchy_id"`
+	Title       string  `json:"title"`
+	ContentText string  `json:"content_text"`
+}
+
+type CommunityPostFeedResponse struct {
+	ID          int     `json:"id"`
+	SubthemeID  int     `json:"subtheme_id"`
+	HierarchyID *string `json:"hierarchy_id"`
+	Title       string  `json:"title"`
+	ContentText string  `json:"content_text"`
+	CreatedAt   string  `json:"created_at"`
+	AuthorName  string  `json:"author_name"`
 }
