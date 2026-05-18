@@ -12,7 +12,7 @@ import { PenBox, Users, Inbox } from "lucide-react";
 export default async function AdminWorkspacePage() {
   return (
     <ThemeWrapper>
-      <div className="min-h-screen p-8 bg-background text-foreground">
+      <div className="min-h-screen p-8 ">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Dashboard Header */}
           <div>
@@ -32,10 +32,10 @@ export default async function AdminWorkspacePage() {
               href="/admin/workspace/content/create"
               className="block group"
             >
-              <Card className="h-full border-border bg-card transition-all duration-200 group-hover:border-primary group-hover:shadow-md cursor-pointer">
+              <Card className="h-full transition-all duration-200 group-hover:border-primary group-hover:bg-primary/10 cursor-pointer">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                    <PenBox className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
+                    <PenBox className="text-primary group-hover:brightness-110" />
                   </div>
                   <CardTitle className="text-xl">Post Official Content</CardTitle>
                   <CardDescription className="text-base mt-2">
@@ -50,10 +50,10 @@ export default async function AdminWorkspacePage() {
               href="/admin/workspace/users"
               className="block group"
             >
-              <Card className="h-full border-border bg-card transition-all duration-200 group-hover:border-primary group-hover:shadow-md cursor-pointer">
+              <Card className="h-full transition-all duration-200 group-hover:border-primary group-hover:bg-primary/10 cursor-pointer">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                    <Users className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
+                    <Users className="text-primary group-hover:brightness-110" />
                   </div>
                   <CardTitle className="text-xl">
                     User Management
