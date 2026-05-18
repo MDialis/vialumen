@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export function FormContentData({ initialSubthemes, formState }: any) {
   return (
-    <Card className="border-border bg-card shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>Subtheme & Content Data</CardTitle>
       </CardHeader>
@@ -26,15 +26,17 @@ export function FormContentData({ initialSubthemes, formState }: any) {
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-muted-foreground">Content Type</label>
             <Input
               value={formState.contentType}
               onChange={(e) => formState.setContentType(e.target.value)}
-              placeholder="e.g. core_spec"
+              placeholder="e.g. Overview, Article, FAQ, etc..."
             />
           </div>
         </div>
+        
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase text-muted-foreground">Payload Data</label>
           <Textarea
@@ -44,6 +46,7 @@ export function FormContentData({ initialSubthemes, formState }: any) {
             placeholder="Enter Markdown payload..."
           />
         </div>
+
         <div className="flex items-center space-x-2">
           <Checkbox
             id="active"

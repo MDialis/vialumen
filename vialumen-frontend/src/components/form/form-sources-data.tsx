@@ -13,7 +13,7 @@ interface FormSourcesDataProps {
 
 export function FormSourcesData({ sources, addSource, removeSource, updateSource }: FormSourcesDataProps) {
   return (
-    <Card className="border-border bg-card shadow-sm">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <CardTitle className="text-xl">Citations</CardTitle>
         <Button type="button" variant="outline" size="sm" onClick={addSource}>

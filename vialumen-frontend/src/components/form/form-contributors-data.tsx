@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Trash2, UserCheck, Search } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 interface FormContributorsDataProps {
   contributors: FormContributor[];
@@ -19,8 +21,8 @@ export function FormContributorsData({
   updateContributor,
 }: FormContributorsDataProps) {
   return (
-    <Card className="border-border bg-card shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl">Contributors</CardTitle>
         <div className="flex gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => addContributor("platform")}>
@@ -33,10 +35,10 @@ export function FormContributorsData({
       </CardHeader>
       <CardContent className="space-y-4">
         {contributors.map((c, i) => (
-          <div key={i} className="p-4 border border-border/60 rounded-md bg-secondary/20 space-y-3 relative">
+          <div key={i} className="p-4 border border-border/80 rounded-lg bg-secondary/20 space-y-2 relative">
             <div className="flex justify-between items-center">
               <Badge variant={c.type === "platform" ? "default" : "secondary"}>
-                {c.type === "platform" ? "Internal Node" : "External Node"}
+                {c.type === "platform" ? "Platform User" : "External Entity"}
               </Badge>
               <Button
                 type="button"
@@ -69,31 +71,58 @@ export function FormContributorsData({
                       </Button>
                     </div>
                   ) : (
-                    <div className="relative">
-                      <Input
-                        placeholder="Type username..."
-                        value={c.searchQuery}
-                        onChange={(e) => updateContributor(i, { searchQuery: e.target.value })}
-                      />
-                      <div className="absolute right-3 top-3 text-muted-foreground">
-                        {c.isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                      </div>
-                      {c.searchResults.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-md max-h-40 overflow-y-auto">
-                          {c.searchResults.map((u) => (
-                            <button
-                              type="button"
-                              key={u.id}
-                              className="w-full text-left p-2 text-sm hover:bg-muted border-b border-border/40 flex flex-col"
-                              onClick={() => updateContributor(i, { user_id: u.id, displayName: `${u.name} (@${u.username})`, searchResults: [] })}
-                            >
-                              <span className="font-semibold">{u.name}</span>
-                              <span className="text-xs text-muted-foreground">@{u.username}</span>
-                            </button>
-                          ))}
+                    <Popover open={c.searchQuery.length > 0}>
+                      <PopoverTrigger asChild>
+                        <div className="relative">
+                          <Input
+                            placeholder="Type username..."
+                            value={c.searchQuery}
+                            onChange={(e) => updateContributor(i, { searchQuery: e.target.value })}
+                            className="py-5"
+                          />
+                          
+                          <div className="absolute right-3 top-3 text-muted-foreground pointer-events-none">
+                            {c.isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </PopoverTrigger>
+                      
+                      <PopoverContent 
+                        className="w-[var(--radix-popover-trigger-width)] p-0" 
+                        align="start"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                      >
+                        <Command shouldFilter={false}>
+                          <CommandList>
+                            {c.isSearching && <CommandEmpty>Searching network...</CommandEmpty>}
+                            {!c.isSearching && c.searchResults.length === 0 && (
+                              <CommandEmpty>No users found.</CommandEmpty>
+                            )}
+
+                            <CommandGroup>
+                              {c.searchResults.map((u) => (
+                                <CommandItem
+                                  key={u.id}
+                                  value={u.id}
+                                  className="justify-between p-2 px-3 cursor-pointer"
+                                  onSelect={() => {
+                                    updateContributor(i, {
+                                      user_id: u.id,
+                                      displayName: `${u.name} (@${u.username})`,
+                                      searchResults: [],
+                                      searchQuery: "",
+                                    });
+                                  }}
+                                >
+                                  <span className="font-semibold">{u.name}</span>
+                                  <span className="text-xs text-muted-foreground">@{u.username}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </div>
               ) : (
@@ -101,18 +130,20 @@ export function FormContributorsData({
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase text-muted-foreground">Identity Label</label>
                   <Input
-                    placeholder="e.g. John Doe"
+                    placeholder="e.g. John/Jane Doe"
                     value={c.external_name || ""}
                     onChange={(e) => updateContributor(i, { external_name: e.target.value })}
+                    className="py-5"
                   />
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">System Role</label>
+                <label className="text-xs font-bold uppercase text-muted-foreground">Role in the content</label>
                 <Input
                   value={c.role}
                   onChange={(e) => updateContributor(i, { role: e.target.value })}
-                  placeholder="Author"
+                  placeholder="e.g. Author, Editor, Reviewer, etc..."
+                  className="py-5"
                 />
               </div>
             </div>
