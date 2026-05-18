@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeWrapper } from "@/components/theme-wrapper";
+import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
 import {
   Card,
   CardDescription,

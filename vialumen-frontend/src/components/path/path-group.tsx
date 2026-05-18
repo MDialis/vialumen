@@ -1,8 +1,8 @@
 "use client";
 
-import ContentTabs from "@/components/content-tabs";
-import ContentBody from "@/components/content-body";
-import ContentMeta from "@/components/content-meta";
+import ContentTabs from "@/components/path/path-tabs";
+import ContentBody from "@/components/path/path-body";
+import ContentMeta from "@/components/path/path-meta";
 import { useContentContext } from "@/contexts/content-context";
 
 export default function ContentGroup() {

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/accordion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ThemeSwitcher } from "@/components/appearance/theme-switcher";
 import { useAppTheme, ThemeMode } from "@/contexts/theme-provider";
 import { authClient } from "@/lib/auth-client";
 

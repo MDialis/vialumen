@@ -1,5 +1,5 @@
 import { Link, ShieldAlert } from "lucide-react";
-import { ThemeWrapper } from "./theme-wrapper";
+import { ThemeWrapper } from "./appearance/theme-wrapper";
 import { Button } from "./ui/button";
 
 export default function NoCredentialsMessage() {

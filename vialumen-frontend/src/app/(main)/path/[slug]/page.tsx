@@ -1,12 +1,12 @@
-import { ThemeWrapper } from "@/components/theme-wrapper";
+import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
 import { getOfficialSubthemeBySlug } from "@/lib/api";
-import ContentGroup from "@/components/content-group";
+import ContentGroup from "@/components/path/path-group";
 import { OfficialPageResponse } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 import { ContentProvider } from "@/contexts/content-context";
-import ContentToolbar from "@/components/content-toolbar";
+import ContentToolbar from "@/components/path/path-toolbar";
 
 export default async function PathPage({
   params,
