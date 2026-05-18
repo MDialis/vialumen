@@ -10,8 +10,9 @@ import {
 import Link from "next/link";
 import AppearanceSettings from "./appearance-settings";
 import UserButton from "./user-button";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, PlusCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "./ui/button";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -25,7 +26,11 @@ interface NavbarProps {
 
 export default function Navbar({ transparent = false }: NavbarProps) {
   const { data: session } = authClient.useSession();
+
+  const isLoggedIn = !!session?.user;
   const isAdmin = session?.user?.role === "admin";
+
+  const postRoute = isLoggedIn ? "/community/create" : "/login";
 
   return (
     <nav
@@ -62,6 +67,20 @@ export default function Navbar({ transparent = false }: NavbarProps) {
               <LayoutDashboard className="w-4 h-4" />
             </Link>
           )}
+
+          {/* New Create Post Button */}
+          <Button
+            asChild
+            variant={transparent ? "default" : "outline"}
+            size="sm"
+            className="rounded-full border-2"
+          >
+            <Link href={postRoute} className="flex items-center gap-1.5">
+              <PlusCircle className="w-4 h-4" />
+              <span className="hidden sm:inline-block font-semibold">Post</span>
+            </Link>
+          </Button>
+
           <AppearanceSettings />
           <UserButton />
         </div>

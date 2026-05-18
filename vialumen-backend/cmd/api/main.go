@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/MDialis/vialumen-backend/internal/handlers"
+	"github.com/MDialis/vialumen-backend/internal/middleware"
 )
 
 func main() {
@@ -37,23 +38,42 @@ func main() {
 		DB: db,
 	}
 
+	authMiddleware := middleware.AuthMiddleware(db)
+
 	mux := http.NewServeMux()
 
+	// =========================
+	// GET ROUTES
+	// =========================
 	mux.HandleFunc("GET /api/health", handlers.HealthCheck)
-	mux.HandleFunc("GET /api/hierarchies", appHandler.GetHierarchyLevels)
-	mux.HandleFunc("GET /api/subthemes", appHandler.GetAllSubthemes)
+
+	// USER PROFILES
+	mux.HandleFunc("GET /api/profile/{username}", appHandler.GetUserProfile)
 	mux.HandleFunc("GET /api/users/search", appHandler.SearchAllUsers)
 
-	mux.HandleFunc("GET /api/profile/{username}", appHandler.GetUserProfile)
-	//	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
+	// HIERARCHIES
+	mux.HandleFunc("GET /api/hierarchies", appHandler.GetHierarchyLevels)
 	mux.HandleFunc("GET /api/core/{id}", appHandler.GetSubthemesConnectionsByHierarchy)
+
+	// SUBTHEMES
+	mux.HandleFunc("GET /api/subthemes", appHandler.GetAllSubthemes)
+	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
+
+	// OFFICIAL CONTENT
 	mux.HandleFunc("GET /api/path/{slug}", appHandler.GetOfficialSubthemeBySlug)
 	mux.HandleFunc("GET /api/path/{slug}/{contentType}", appHandler.GetVersionHistory)
 	mux.HandleFunc("GET /api/version/{id}", appHandler.GetSpecificVersion)
 
-	mux.HandleFunc("POST /api/subthemes", appHandler.CreateSubtheme)
-	mux.HandleFunc("POST /api/subthemes/connect", appHandler.ConnectSubthemes)
-	mux.HandleFunc("POST /api/content/post", appHandler.CreateOfficialVersion)
+	// COMMUNITY CONTENT
+	mux.HandleFunc("GET /api/community", appHandler.GetCommunityPosts)
+
+	// =========================
+	// POST ROUTES
+	// =========================
+	mux.Handle("POST /api/subthemes", authMiddleware(http.HandlerFunc(appHandler.CreateSubtheme)))
+	mux.Handle("POST /api/subthemes/connect", authMiddleware(http.HandlerFunc(appHandler.ConnectSubthemes)))
+	mux.Handle("POST /api/admin/workspace/content/create", authMiddleware(http.HandlerFunc(appHandler.CreateOfficialVersion)))
+	mux.Handle("POST /api/community", authMiddleware(http.HandlerFunc(appHandler.CreateCommunityPost)))
 
 	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
 	if allowedOrigin == "" {

@@ -172,12 +172,16 @@ export async function getUserProfile(
   }
 }
 
-export async function postOfficialContent(payload: CreateContentPayload): Promise<boolean> {
+export async function postOfficialContent(
+  payload: CreateContentPayload,
+  token: string
+): Promise<boolean> {
   try {
-    const response = await fetch(`${API}/content/post`, {
+    const response = await fetch(`${API}/admin/workspace/content/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     });
