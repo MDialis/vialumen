@@ -40,7 +40,7 @@ export function useOfficialContentForm(token: string) {
         user_id: null,
         external_name: null,
         displayName: "",
-        role: "Author",
+        role: "",
         searchQuery: "",
         searchResults: [],
         isSearching: false,
@@ -134,11 +134,13 @@ export function useOfficialContentForm(token: string) {
     isActive,
     contributors,
     sources,
+    
     // Setters
     setSubthemeId,
     setContentType,
     setContentText,
     setIsActive,
+
     // Actions
     addContributor,
     removeContributor,

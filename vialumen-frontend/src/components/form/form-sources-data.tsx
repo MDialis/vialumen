@@ -14,7 +14,7 @@ interface FormSourcesDataProps {
 export function FormSourcesData({ sources, addSource, removeSource, updateSource }: FormSourcesDataProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl">Citations</CardTitle>
         <Button type="button" variant="outline" size="sm" onClick={addSource}>
           <Plus className="w-4 h-4 mr-1" /> Add Source
@@ -41,6 +41,7 @@ export function FormSourcesData({ sources, addSource, removeSource, updateSource
                   value={s.title}
                   onChange={(e) => updateSource(i, { title: e.target.value })}
                   placeholder="Reference designation"
+                  className="py-5"
                 />
               </div>
               <div className="space-y-2">
@@ -51,6 +52,7 @@ export function FormSourcesData({ sources, addSource, removeSource, updateSource
                   value={s.source_type}
                   onChange={(e) => updateSource(i, { source_type: e.target.value })}
                   placeholder="e.g. web_article"
+                  className="py-5"
                 />
               </div>
             </div>
@@ -61,6 +63,7 @@ export function FormSourcesData({ sources, addSource, removeSource, updateSource
               </label>
               <Input
                 type="url"
+                className="py-5"
                 value={s.url}
                 onChange={(e) => updateSource(i, { url: e.target.value })}
                 placeholder="https://..."

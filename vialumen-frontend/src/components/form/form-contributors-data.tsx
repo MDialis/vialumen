@@ -22,7 +22,7 @@ export function FormContributorsData({
 }: FormContributorsDataProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl">Contributors</CardTitle>
         <div className="flex gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => addContributor("platform")}>
@@ -128,7 +128,7 @@ export function FormContributorsData({
               ) : (
                 /* External User Input */
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">Identity Label</label>
+                  <label className="text-xs font-bold uppercase text-muted-foreground">Name</label>
                   <Input
                     placeholder="e.g. John/Jane Doe"
                     value={c.external_name || ""}
