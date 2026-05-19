@@ -49,7 +49,15 @@ const THEMES = [
   { id: "premiumtest", label: "Premium Test", customColor: "bg-zinc-950 border border-yellow-600/50" },
 ];
 
-export default function AppearanceSettings() {
+interface AppearanceSettingsProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export default function AppearanceSettings({
+  open,
+  onOpenChange,
+}: AppearanceSettingsProps = {}) {
   const router = useRouter();
   const { fontSize, setFontSize, fontFamily, setFontFamily } = useFont();
   const { mode, setMode } = useAppTheme();
@@ -58,12 +66,14 @@ export default function AppearanceSettings() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Appearance settings">
-          <Palette className="w-5 h-5 text-muted-foreground" />
-        </Button>
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      {open === undefined && (
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Appearance settings">
+            <Palette className="w-5 h-5 text-muted-foreground" />
+          </Button>
+        </SheetTrigger>
+      )}
 
       <SheetContent className="w-100 sm:w-135 flex flex-col p-0">
         {/* PINNED HEADER */}

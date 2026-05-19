@@ -8,7 +8,6 @@ import {
   InputGroupInput,
 } from "./ui/input-group";
 import Link from "next/link";
-import AppearanceSettings from "./appearance/appearance-settings";
 import UserButton from "./user-button";
 import { LayoutDashboard, PlusCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -68,7 +67,6 @@ export default function Navbar({ transparent = false }: NavbarProps) {
             </Link>
           )}
 
-          {/* New Create Post Button */}
           <Button
             asChild
             variant={transparent ? "default" : "outline"}
@@ -81,7 +79,6 @@ export default function Navbar({ transparent = false }: NavbarProps) {
             </Link>
           </Button>
 
-          <AppearanceSettings />
           <UserButton />
         </div>
       </div>
