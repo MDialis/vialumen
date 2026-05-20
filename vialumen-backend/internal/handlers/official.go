@@ -18,7 +18,7 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 	}
 
 	var response types.OfficialPageResponse
-	response.Blocks = []types.ContentBlockResponse{} // Initialize empty array
+	response.Blocks = []types.ContentBlockResponse{}
 
 	// Fetch the Base Subtheme Info
 	err := h.DB.QueryRow(`
@@ -69,10 +69,10 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 
 		// Fetch Contributors for this specific block
 		cRows, _ := h.DB.Query(`
-			SELECT COALESCE(u.name, oc.external_name), oc.contribution_role
-			FROM official_contributors oc
-			LEFT JOIN users u ON oc.user_id = u.id
-			WHERE oc.version_id = $1`, block.VersionID,
+			SELECT COALESCE(u.name, c.external_name), c.contribution_role
+			FROM contributors c
+			LEFT JOIN "users" u ON c.user_id = u.id
+			WHERE c.official_version_id = $1`, block.VersionID,
 		)
 		defer cRows.Close()
 		for cRows.Next() {
@@ -81,7 +81,6 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 			block.Contributors = append(block.Contributors, c)
 		}
 
-		// Fetch Sources for this specific block
 		sRows, _ := h.DB.Query(`SELECT title, url FROM sources WHERE official_version_id = $1`, block.VersionID)
 		defer sRows.Close()
 		for sRows.Next() {
@@ -109,7 +108,7 @@ func (h *Handler) GetVersionHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 1. Find the subtheme ID first to ensure it exists
+	// Find the subtheme ID to ensure it exists
 	var subthemeID int
 	err := h.DB.QueryRow(`SELECT id FROM subthemes WHERE slug = $1`, slug).Scan(&subthemeID)
 	if err != nil {
@@ -117,7 +116,7 @@ func (h *Handler) GetVersionHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 2. Fetch the lightweight history
+	// Fetch the history
 	query := `
 		SELECT id, accepted_at, is_active
 		FROM official_versions
@@ -176,10 +175,10 @@ func (h *Handler) GetSpecificVersion(w http.ResponseWriter, r *http.Request) {
 	block.Sources = []types.SourceResponse{}
 
 	cRows, _ := h.DB.Query(`
-		SELECT COALESCE(u.name, oc.external_name), oc.contribution_role
-		FROM official_contributors oc
-		LEFT JOIN users u ON oc.user_id = u.id
-		WHERE oc.version_id = $1`, block.VersionID,
+		SELECT COALESCE(u.name, c.external_name), c.contribution_role
+		FROM contributors c
+		LEFT JOIN "users" u ON c.user_id = u.id
+		WHERE c.official_version_id = $1`, block.VersionID,
 	)
 	defer cRows.Close()
 	for cRows.Next() {
@@ -255,7 +254,7 @@ func (h *Handler) CreateOfficialVersion(w http.ResponseWriter, r *http.Request) 
 	// Insert Contributors
 	for _, c := range req.Contributors {
 		_, err = tx.Exec(`
-			INSERT INTO official_contributors (version_id, user_id, external_name, contribution_role)
+			INSERT INTO contributors (official_version_id, user_id, external_name, contribution_role)
 			VALUES ($1, $2, $3, $4)`,
 			versionID, c.UserID, c.ExternalName, c.Role,
 		)
@@ -280,7 +279,7 @@ func (h *Handler) CreateOfficialVersion(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	// Commit everything to the database!
+	// Commit to the database
 	if err = tx.Commit(); err != nil {
 		log.Printf("Error committing transaction: %v", err)
 		http.Error(w, "Failed to save data", http.StatusInternalServerError)
