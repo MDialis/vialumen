@@ -9,7 +9,6 @@ import (
 )
 
 func (h *Handler) CreateCommunityPost(w http.ResponseWriter, r *http.Request) {
-	// Extract the secure user_id from the context
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
 		http.Error(w, "Unauthorized: User ID not found in context", http.StatusUnauthorized)
@@ -27,18 +26,56 @@ func (h *Handler) CreateCommunityPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tx, err := h.DB.Begin()
+	if err != nil {
+		http.Error(w, "Failed to start transaction", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
 	var postID int
-	// HierarchyID can safely be passed as nil if the subtheme isn't on the graph yet
-	err := h.DB.QueryRow(`
-		INSERT INTO community_posts (subtheme_id, hierarchy_id, user_id, title, content_text, status)
-		VALUES ($1, $2, $3, $4, $5, 'published')
+	err = tx.QueryRow(`
+		INSERT INTO community_posts (subtheme_id, user_id, title, content_text, status)
+		VALUES ($1, $2, $3, $4, 'published')
 		RETURNING id`,
-		req.SubthemeID, req.HierarchyID, userID, req.Title, req.ContentText,
+		req.SubthemeID, userID, req.Title, req.ContentText,
 	).Scan(&postID)
 
 	if err != nil {
 		log.Printf("Error creating community post: %v", err)
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
+		return
+	}
+
+	for _, c := range req.Contributors {
+		_, err = tx.Exec(`
+			INSERT INTO contributors (community_post_id, user_id, external_name, contribution_role)
+			VALUES ($1, $2, $3, $4)`,
+			postID, c.UserID, c.ExternalName, c.Role,
+		)
+		if err != nil {
+			log.Printf("Error inserting post contributor: %v", err)
+			http.Error(w, "Failed to insert contributors", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	for _, s := range req.Sources {
+		_, err = tx.Exec(`
+			INSERT INTO sources (community_post_id, title, url, source_type)
+			VALUES ($1, $2, $3, $4)`,
+			postID, s.Title, s.URL, s.SourceType,
+		)
+		if err != nil {
+			log.Printf("Error inserting post source: %v", err)
+			http.Error(w, "Failed to insert sources", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		log.Printf("Error committing transaction: %v", err)
+		http.Error(w, "Failed to save data", http.StatusInternalServerError)
 		return
 	}
 
@@ -50,23 +87,20 @@ func (h *Handler) CreateCommunityPost(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GetCommunityPosts fetches the feed
 func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	subthemeID := r.URL.Query().Get("subtheme_id")
-	hierarchyID := r.URL.Query().Get("hierarchy")
 
 	query := `
-		SELECT cp.id, cp.subtheme_id, cp.hierarchy_id, cp.title, cp.content_text, cp.created_at, u.name
+		SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name
 		FROM community_posts cp
-		LEFT JOIN "user" u ON cp.user_id = u.id
+		LEFT JOIN "users" u ON cp.user_id = u.id
 		WHERE cp.status = 'published'
 		AND ($1::text = '' OR cp.subtheme_id = $1::int)
-		AND ($2::text = '' OR cp.hierarchy_id = $2)
 		ORDER BY cp.created_at DESC
 		LIMIT 50
 	`
 
-	rows, err := h.DB.Query(query, subthemeID, hierarchyID)
+	rows, err := h.DB.Query(query, subthemeID)
 	if err != nil {
 		log.Printf("Error fetching posts: %v", err)
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
@@ -79,7 +113,7 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 		var p types.CommunityPostFeedResponse
 		var authorName *string
 
-		if err := rows.Scan(&p.ID, &p.SubthemeID, &p.HierarchyID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName); err != nil {
+		if err := rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName); err != nil {
 			log.Printf("Error scanning post: %v", err)
 			continue
 		}
