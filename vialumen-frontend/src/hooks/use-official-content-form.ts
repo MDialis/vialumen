@@ -1,6 +1,10 @@
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { UserSearchResult, CreateContentPayload } from "@/types";
+import { 
+  UserSearchResult, 
+  CreateOfficialVersionPayload, 
+  SourceRequest
+} from "@/types"; 
 import { searchUsers, postOfficialContent } from "@/lib/api";
 
 export interface FormContributor {
@@ -9,15 +13,11 @@ export interface FormContributor {
   external_name: string | null;
   displayName: string;
   role: string;
+  
+  // UI-only states for autocomplete rendering
   searchQuery: string;
   searchResults: UserSearchResult[];
   isSearching: boolean;
-}
-
-export interface FormSource {
-  title: string;
-  source_type: string;
-  url: string;
 }
 
 export function useOfficialContentForm(token: string) {
@@ -30,7 +30,8 @@ export function useOfficialContentForm(token: string) {
   const [contentText, setContentText] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [contributors, setContributors] = useState<FormContributor[]>([]);
-  const [sources, setSources] = useState<FormSource[]>([]);
+  
+  const [sources, setSources] = useState<SourceRequest[]>([]);
 
   const addContributor = (type: "platform" | "external") => {
     setContributors((prev) => [
@@ -62,7 +63,7 @@ export function useOfficialContentForm(token: string) {
 
   const removeSource = (index: number) => setSources((prev) => prev.filter((_, i) => i !== index));
 
-  const updateSource = (index: number, fields: Partial<FormSource>) => {
+  const updateSource = (index: number, fields: Partial<SourceRequest>) => {
     setSources((prev) => prev.map((item, i) => (i === index ? { ...item, ...fields } : item)));
   };
 
@@ -90,7 +91,7 @@ export function useOfficialContentForm(token: string) {
       return setStatus({ error: "Content Type and Body are required." });
     }
 
-    const payload: CreateContentPayload = {
+    const payload: CreateOfficialVersionPayload = {
       subtheme_id: Number(subthemeId),
       content_type: contentType.trim(),
       content_text: contentText,
@@ -104,7 +105,7 @@ export function useOfficialContentForm(token: string) {
         .map((s) => ({
           title: s.title.trim(),
           source_type: s.source_type.trim(),
-          url: s.url.trim() || undefined
+          url: s.url ? s.url.trim() : null,
         }))
         .filter((s) => s.title && s.source_type),
     };

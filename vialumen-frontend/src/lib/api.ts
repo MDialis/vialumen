@@ -173,7 +173,7 @@ export async function getUserProfile(
 }
 
 export async function postOfficialContent(
-  payload: CreateContentPayload,
+  payload: CreateOfficialVersionPayload,
   token: string
 ): Promise<boolean> {
   try {
@@ -190,6 +190,7 @@ export async function postOfficialContent(
       console.error(`Post failed: ${response.status} ${response.statusText}`);
       return false;
     }
+    
     return true;
   } catch (error) {
     console.error("Network error posting content:", error);

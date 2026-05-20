@@ -96,23 +96,23 @@ export interface UserSearchResult {
   name: string;
 }
 
-export interface ContributorPayload {
+export interface ContributorRequest {
   user_id: string | null;
   external_name: string | null;
   role: string;
 }
 
-export interface SourcePayload {
+export interface SourceRequest {
   title: string;
-  url?: string;
+  url: string | null;
   source_type: string;
 }
 
-export interface CreateContentPayload {
+export interface CreateOfficialVersionPayload {
   subtheme_id: number;
   content_type: string;
   content_text: string;
   is_active: boolean;
-  contributors: ContributorPayload[];
-  sources: SourcePayload[];
+  contributors: ContributorRequest[];
+  sources: SourceRequest[];
 }
