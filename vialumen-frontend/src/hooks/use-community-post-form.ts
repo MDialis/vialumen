@@ -2,22 +2,21 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { 
   UserSearchResult, 
-  CreateOfficialVersionPayload, 
+  CreateCommunityPostPayload, 
   SourceRequest,
   FormContributor
-} from "@/types"; 
-import { searchUsers, postOfficialContent } from "@/lib/api";
+} from "@/types";
+import { searchUsers, postCommunityContent } from "@/lib/api";
 
 
-export function useOfficialContentForm(token: string) {
+export function useCommunityPostForm(token: string) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<{ error?: string; success?: boolean }>({});
 
   const [subthemeId, setSubthemeId] = useState("");
-  const [contentType, setContentType] = useState("");
+  const [title, setTitle] = useState("");
   const [contentText, setContentText] = useState("");
-  const [isActive, setIsActive] = useState(true);
   
   const [contributors, setContributors] = useState<FormContributor[]>([]);
   const [sources, setSources] = useState<SourceRequest[]>([]);
@@ -25,37 +24,31 @@ export function useOfficialContentForm(token: string) {
   const addContributor = (type: "platform" | "external") => {
     setContributors((prev) => [
       ...prev,
-      {
-        type,
-        user_id: null,
-        external_name: null,
-        displayName: "",
+      { 
+        type, 
+        user_id: null, 
+        external_name: null, 
+        displayName: "", 
         role: "",
-        searchQuery: "",
-        searchResults: [],
-        isSearching: false,
+        searchQuery: "", 
+        searchResults: [], 
+        isSearching: false 
       },
     ]);
   };
-
-  const removeContributor = (index: number) => {
-    setContributors((prev) => prev.filter((_, i) => i !== index));
-  };
-
+  
+  const removeContributor = (index: number) => setContributors((prev) => prev.filter((_, i) => i !== index));
   const updateContributor = (index: number, fields: Partial<FormContributor>) => {
-    setContributors((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, ...fields } : item))
-    );
+    setContributors((prev) => prev.map((item, i) => (i === index ? { ...item, ...fields } : item)));
   };
 
   const addSource = () => setSources((prev) => [...prev, { title: "", source_type: "", url: "" }]);
-
   const removeSource = (index: number) => setSources((prev) => prev.filter((_, i) => i !== index));
-
   const updateSource = (index: number, fields: Partial<SourceRequest>) => {
     setSources((prev) => prev.map((item, i) => (i === index ? { ...item, ...fields } : item)));
   };
 
+  // Debounced user search
   useEffect(() => {
     const timers = contributors.map((contrib, index) => {
       if (contrib.type === "platform" && contrib.searchQuery.trim() && !contrib.user_id) {
@@ -67,7 +60,6 @@ export function useOfficialContentForm(token: string) {
       }
       return null;
     });
-
     return () => timers.forEach((t) => t && clearTimeout(t));
   }, [contributors.map((c) => c.searchQuery).join(",")]);
 
@@ -75,16 +67,14 @@ export function useOfficialContentForm(token: string) {
     e.preventDefault();
     setStatus({});
 
-    if (!subthemeId) return setStatus({ error: "Please select a subtheme." });
-    if (!contentType.trim() || !contentText.trim()) {
-      return setStatus({ error: "Content Type and Body are required." });
-    }
+    if (!subthemeId) return setStatus({ error: "Please select a topic/subtheme." });
+    if (!title.trim()) return setStatus({ error: "Your post needs a title." });
+    if (!contentText.trim()) return setStatus({ error: "Your post needs some content." });
 
-    const payload: CreateOfficialVersionPayload = {
+    const payload: CreateCommunityPostPayload = {
       subtheme_id: Number(subthemeId),
-      content_type: contentType.trim(),
+      title: title.trim(),
       content_text: contentText,
-      is_active: isActive,
       contributors: contributors.map((c) => ({
         user_id: c.type === "platform" ? c.user_id : null,
         external_name: c.type === "external" ? c.external_name : null,
@@ -94,50 +84,31 @@ export function useOfficialContentForm(token: string) {
         .map((s) => ({
           title: s.title.trim(),
           source_type: s.source_type.trim(),
-          url: s.url ? s.url.trim() : null,
+          url: s.url ? s.url.trim() : null
         }))
         .filter((s) => s.title && s.source_type),
     };
 
     startTransition(async () => {
-      const success = await postOfficialContent(payload, token);
+      const success = await postCommunityContent(payload, token);
       if (success) {
         setStatus({ success: true });
+        setTitle("");
         setContentText("");
-        setContentType("");
         setContributors([]);
         setSources([]);
-        router.refresh();
+        router.push("/community"); 
       } else {
-        setStatus({ error: "Failed to publish content to the backend servers." });
+        setStatus({ error: "Failed to publish your post. Please try again." });
       }
     });
   };
 
   return {
-    // Form State
-    isPending,
-    status,
-    subthemeId,
-    contentType,
-    contentText,
-    isActive,
-    contributors,
-    sources,
-    
-    // Setters
-    setSubthemeId,
-    setContentType,
-    setContentText,
-    setIsActive,
-
-    // Actions
-    addContributor,
-    removeContributor,
-    updateContributor,
-    addSource,
-    removeSource,
-    updateSource,
+    isPending, status, subthemeId, title, contentText, contributors, sources,
+    setSubthemeId, setTitle, setContentText,
+    addContributor, removeContributor, updateContributor,
+    addSource, removeSource, updateSource,
     handleSubmit,
   };
 }

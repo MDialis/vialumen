@@ -21,7 +21,7 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function FormContentData({ initialSubthemes, formState }: any) {
+export function FormOfficialContentData({ initialSubthemes, formState }: any) {
   const [open, setOpen] = useState(false);
 
   const selectedTheme = initialSubthemes.find(

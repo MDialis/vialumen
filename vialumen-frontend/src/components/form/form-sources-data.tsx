@@ -1,14 +1,14 @@
-import { FormSource } from "@/hooks/use-official-content-form";
+import { SourceRequest } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2, Link as LinkIcon } from "lucide-react";
 
 interface FormSourcesDataProps {
-  sources: FormSource[];
+  sources: SourceRequest[];
   addSource: () => void;
   removeSource: (index: number) => void;
-  updateSource: (index: number, fields: Partial<FormSource>) => void;
+  updateSource: (index: number, fields: Partial<SourceRequest>) => void;
 }
 
 export function FormSourcesData({ sources, addSource, removeSource, updateSource }: FormSourcesDataProps) {
@@ -64,7 +64,7 @@ export function FormSourcesData({ sources, addSource, removeSource, updateSource
               <Input
                 type="url"
                 className="py-5"
-                value={s.url}
+                value={s.url || ""}
                 onChange={(e) => updateSource(i, { url: e.target.value })}
                 placeholder="https://..."
               />

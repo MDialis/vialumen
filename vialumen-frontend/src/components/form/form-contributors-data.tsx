@@ -1,4 +1,4 @@
-import { FormContributor } from "@/hooks/use-official-content-form";
+import { FormContributor } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 interface FormContributorsDataProps {
-  contributors: FormContributor[];
+  contributors: FormContributor[]; 
   addContributor: (type: "platform" | "external") => void;
   removeContributor: (index: number) => void;
   updateContributor: (index: number, fields: Partial<FormContributor>) => void;

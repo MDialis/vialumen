@@ -5,8 +5,7 @@ import { useOfficialContentForm } from "@/hooks/use-official-content-form";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-// Import these from wherever you decide to save them
-import { FormContentData } from "./form-content-data";
+import { FormOfficialContentData } from "./form-official-content-data";
 import { FormContributorsData } from "./form-contributors-data";
 import { FormSourcesData } from "./form-sources-data";
 
@@ -23,7 +22,7 @@ export default function OfficialContentForm({
 
   return (
     <form onSubmit={formState.handleSubmit} className="space-y-8 pb-12">
-      <FormContentData
+      <FormOfficialContentData
         initialSubthemes={initialSubthemes}
         formState={formState}
       />

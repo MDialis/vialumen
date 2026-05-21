@@ -1,5 +1,5 @@
 import { getSubthemes } from "@/lib/api";
-import OfficialContentForm from "@/components/form/form-content";
+import OfficialContentForm from "@/components/form/form-official";
 import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/auth";
