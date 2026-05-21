@@ -116,3 +116,24 @@ export interface CreateOfficialVersionPayload {
   contributors: ContributorRequest[];
   sources: SourceRequest[];
 }
+
+export interface CreateCommunityPostPayload {
+  subtheme_id: number;
+  title: string;
+  content_text: string;
+  contributors: ContributorRequest[]; // Can be an empty array []
+  sources: SourceRequest[];           // Can be an empty array []
+}
+
+export interface FormContributor {
+  type: "platform" | "external";
+  user_id: string | null;
+  external_name: string | null;
+  displayName: string;
+  role: string;
+  
+  // UI-only states for autocomplete rendering
+  searchQuery: string;
+  searchResults: UserSearchResult[];
+  isSearching: boolean;
+}

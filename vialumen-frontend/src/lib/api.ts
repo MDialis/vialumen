@@ -7,7 +7,8 @@ import {
   PublicProfileResponse,
   SubthemeSimple,
   UserSearchResult,
-  CreateContentPayload
+  CreateOfficialVersionPayload,
+  CreateCommunityPostPayload
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
@@ -194,6 +195,32 @@ export async function postOfficialContent(
     return true;
   } catch (error) {
     console.error("Network error posting content:", error);
+    return false;
+  }
+}
+
+export async function postCommunityContent(
+  payload: CreateCommunityPostPayload,
+  token: string
+): Promise<boolean> {
+  try {
+    const response = await fetch(`${API}/community`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      console.error(`Community post failed: ${response.status} ${response.statusText}`);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Network error posting community content:", error);
     return false;
   }
 }
