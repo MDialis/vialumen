@@ -1,7 +1,6 @@
-"use client";
-
-import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import {
   Card,
   CardContent,
@@ -11,26 +10,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Mail, AtSign, LogOut } from "lucide-react";
+import { User, Mail, AtSign } from "lucide-react";
+import LogoutButton from "@/components/logout-button";
 
-export default function ProfilePage() {
-  const { data: session, isPending } = authClient.useSession();
+export default async function ProfilePage() {
+  const sessionData = await auth.api.getSession({ headers: await headers() });
 
-  // Show a simple loading state while fetching the session
-  if (isPending) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground animate-pulse">Loading profile...</p>
-      </div>
-    );
+  if (!sessionData?.user) {
+    redirect("/login"); 
   }
 
-  // Fallback if there's no session data
-  if (!session?.user) {
-    return null; 
-  }
-
-  const { name, email, username } = session.user;
+  const { name, email, username } = sessionData.user;
   
   // Grab the first two letters of the name for the avatar fallback
   const initials = name?.substring(0, 2).toUpperCase() || "US";
@@ -90,14 +80,7 @@ export default function ProfilePage() {
         </CardContent>
 
         <CardFooter className="flex justify-end pt-6 border-t mt-2">
-          <Button
-            variant="destructive"
-            onClick={() => authClient.signOut()}
-            className="gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Log Out
-          </Button>
+          <LogoutButton />
         </CardFooter>
       </Card>
     </div>
