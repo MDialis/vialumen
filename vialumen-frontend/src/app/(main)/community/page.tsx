@@ -83,13 +83,13 @@ export default async function CommunityFeedPage() {
           <div className="flex flex-col gap-6 pt-2">
             {!posts || posts.length === 0 ? (
               // Empty State
-              <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed border-border rounded-xl bg-card text-center">
+              <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
                 <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                   <SearchX className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h3 className="text-2xl font-bold mb-2">No posts yet</h3>
                 <p className="text-muted-foreground max-w-sm mb-6">
-                  The matrix is quiet. Be the first to start a conversation or share a theory with the community.
+                  It's like no one noticed this place. What about being the first to start a conversation?
                 </p>
                 <Button asChild variant="outline">
                   <Link href="/community/create">Draft the first post</Link>

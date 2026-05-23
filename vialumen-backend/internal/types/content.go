@@ -71,4 +71,5 @@ type CommunityPostFeedResponse struct {
 	ContentText string     `json:"content_text"`
 	CreatedAt   *time.Time `json:"created_at"`
 	AuthorName  string     `json:"author_name"`
+	NetVotes    int        `json:"net_votes"`
 }

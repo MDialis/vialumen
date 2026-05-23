@@ -88,19 +88,67 @@ func (h *Handler) CreateCommunityPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
+	userID, _ := r.Context().Value("user_id").(string)
+	feedType := r.URL.Query().Get("feed")
+
 	subthemeID := r.URL.Query().Get("subtheme_id")
+	slug := r.URL.Query().Get("slug")
 
-	query := `
-		SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name
-		FROM community_posts cp
-		LEFT JOIN "users" u ON cp.user_id = u.id
-		WHERE cp.status = 'published'
-		AND ($1::text = '' OR cp.subtheme_id = $1::int)
-		ORDER BY cp.created_at DESC
-		LIMIT 50
-	`
+	var query string
+	var args []interface{}
 
-	rows, err := h.DB.Query(query, subthemeID)
+	if slug != "" || subthemeID != "" {
+		// --- CONTEXTUAL FEED ---
+		query = `
+			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			COALESCE(SUM(v.vote_value), 0) AS net_votes
+			FROM community_posts cp
+			JOIN subthemes s ON cp.subtheme_id = s.id 
+			LEFT JOIN "users" u ON cp.user_id = u.id
+			LEFT JOIN community_post_votes v ON cp.id = v.post_id
+			WHERE cp.status = 'published' 
+			AND ($1::text = '' OR s.slug = $1)
+			AND ($2::text = '' OR cp.subtheme_id = $2::int)
+			GROUP BY cp.id, u.name
+			ORDER BY net_votes DESC, cp.created_at DESC
+			LIMIT 15`
+		args = append(args, slug, subthemeID)
+
+	} else if feedType == "home" && userID != "" {
+		// --- THE WEIGHTED DISCOVERY FEED (HOME) ---
+		query = `
+			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			COALESCE(SUM(v.vote_value), 0) AS net_votes,
+			(
+				(COALESCE(SUM(v.vote_value), 0) * 2.0) 
+				+ CASE WHEN us.user_id IS NOT NULL THEN 50.0 ELSE 0.0 END 
+			) / POWER(EXTRACT(EPOCH FROM (NOW() - cp.created_at))/3600 + 2, 1.5) AS dynamic_score
+			FROM community_posts cp
+			LEFT JOIN "users" u ON cp.user_id = u.id
+			LEFT JOIN community_post_votes v ON cp.id = v.post_id
+			LEFT JOIN user_subscriptions us ON cp.subtheme_id = us.subtheme_id AND us.user_id = $1
+			WHERE cp.status = 'published'
+			GROUP BY cp.id, u.name, us.user_id
+			ORDER BY dynamic_score DESC
+			LIMIT 50`
+		args = append(args, userID)
+
+	} else {
+		// --- TRENDING / DEFAULT ---
+		query = `
+			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			COALESCE(SUM(v.vote_value), 0) AS net_votes,
+			(COALESCE(SUM(v.vote_value), 0) / POWER(EXTRACT(EPOCH FROM (NOW() - cp.created_at))/3600 + 2, 1.8)) AS hot_score
+			FROM community_posts cp
+			LEFT JOIN "users" u ON cp.user_id = u.id
+			LEFT JOIN community_post_votes v ON cp.id = v.post_id
+			WHERE cp.status = 'published'
+			GROUP BY cp.id, u.name
+			ORDER BY hot_score DESC
+			LIMIT 50`
+	}
+
+	rows, err := h.DB.Query(query, args...)
 	if err != nil {
 		log.Printf("Error fetching posts: %v", err)
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
@@ -112,8 +160,15 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var p types.CommunityPostFeedResponse
 		var authorName *string
+		var dummyScore float64
 
-		if err := rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName); err != nil {
+		if subthemeID != "" {
+			err = rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes)
+		} else {
+			err = rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes, &dummyScore)
+		}
+
+		if err != nil {
 			log.Printf("Error scanning post: %v", err)
 			continue
 		}

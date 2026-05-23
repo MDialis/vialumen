@@ -138,7 +138,7 @@ export interface FormContributor {
   isSearching: boolean;
 }
 
-export interface CommunityPostResponse {
+export interface CommunityPostFeedResponse {
   id: number;
   subtheme_id: number;
   user_id: string;
@@ -146,4 +146,5 @@ export interface CommunityPostResponse {
   content_text: string;
   created_at: string;
   author_name: string;
+  net_votes: number;
 }
