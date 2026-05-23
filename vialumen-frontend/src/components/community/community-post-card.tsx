@@ -1,4 +1,4 @@
-import { CommunityPostResponse } from "@/types";
+import { CommunityPostFeedResponse } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { MessageSquare, User } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ function timeAgo(dateString: string) {
   return `${days}d ago`;
 }
 
-export function CommunityPostCard({ post }: { post: CommunityPostResponse }) {
+export function CommunityPostCard({ post }: { post: CommunityPostFeedResponse }) {
   return (
     <Card className="border-border bg-card shadow-sm hover:border-primary/50 transition-colors duration-200">
       <CardHeader className="pb-3 flex flex-row items-start justify-between">
