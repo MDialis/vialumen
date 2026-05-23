@@ -131,9 +131,19 @@ export interface FormContributor {
   external_name: string | null;
   displayName: string;
   role: string;
-  
+
   // UI-only states for autocomplete rendering
   searchQuery: string;
   searchResults: UserSearchResult[];
   isSearching: boolean;
+}
+
+export interface CommunityPostResponse {
+  id: number;
+  subtheme_id: number;
+  user_id: string;
+  title: string;
+  content_text: string;
+  created_at: string;
+  author_name: string;
 }

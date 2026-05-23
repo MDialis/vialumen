@@ -8,7 +8,8 @@ import {
   SubthemeSimple,
   UserSearchResult,
   CreateOfficialVersionPayload,
-  CreateCommunityPostPayload
+  CreateCommunityPostPayload,
+  CommunityPostResponse
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
@@ -191,7 +192,7 @@ export async function postOfficialContent(
       console.error(`Post failed: ${response.status} ${response.statusText}`);
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error("Network error posting content:", error);
@@ -217,10 +218,27 @@ export async function postCommunityContent(
       console.error(`Community post failed: ${response.status} ${response.statusText}`);
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error("Network error posting community content:", error);
     return false;
+  }
+}
+
+export async function getCommunityPosts(): Promise<CommunityPostResponse[] | null> {
+  try {
+    // Note: We use cache: 'no-store' here so the feed is always fresh when users visit.
+    const response = await fetch(`${API}/community`, { cache: "no-store" });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch community posts: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Network error fetching community posts:", error);
+    return null;
   }
 }
