@@ -9,10 +9,17 @@ import {
   UserSearchResult,
   CreateOfficialVersionPayload,
   CreateCommunityPostPayload,
-  CommunityPostResponse
+  CommunityPostFeedResponse
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
+
+export interface GetCommunityPostsOptions {
+  feed?: "home" | "trending";
+  subtheme_id?: number;
+  slug?: string;
+  token?: string; // Needed if fetching the personalized "home" feed
+}
 
 export async function getSubthemes(): Promise<SubthemeSimple[] | null> {
   try {
@@ -226,10 +233,34 @@ export async function postCommunityContent(
   }
 }
 
-export async function getCommunityPosts(): Promise<CommunityPostResponse[] | null> {
+export async function getCommunityPosts(
+  options?: GetCommunityPostsOptions
+): Promise<CommunityPostFeedResponse[] | null> {
   try {
-    // Note: We use cache: 'no-store' here so the feed is always fresh when users visit.
-    const response = await fetch(`${API}/community`, { cache: "no-store" });
+    const params = new URLSearchParams();
+
+    if (options?.feed) params.append("feed", options.feed);
+    if (options?.subtheme_id) params.append("subtheme_id", options.subtheme_id.toString());
+    if (options?.slug) params.append("slug", options.slug);
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `${API}/community?${queryString}` : `${API}/community`;
+
+    // Attach token if user is logged in (For the "home" feed)
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    if (options?.token) {
+      headers["Authorization"] = `Bearer ${options.token}`;
+    }
+
+    // Fetch with no-store
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers,
+      cache: "no-store"
+    });
 
     if (!response.ok) {
       console.error(`Failed to fetch community posts: ${response.status} ${response.statusText}`);
