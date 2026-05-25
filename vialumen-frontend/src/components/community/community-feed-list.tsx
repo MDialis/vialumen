@@ -7,11 +7,12 @@ import { CommunityPostFeedResponse } from "@/types";
 interface CommunityFeedListProps {
   posts: CommunityPostFeedResponse[] | null;
   feedType: string;
+  viewMode: "full" | "compact";
 }
 
-export function CommunityFeedList({ posts, feedType }: CommunityFeedListProps) {
+export function CommunityFeedList({ posts, feedType, viewMode }: CommunityFeedListProps) {
   return (
-    <div className="flex flex-col gap-6 pt-2">
+    <div className="flex flex-col gap-6 pt-2 mt-2">
       {!posts || posts.length === 0 ? (
         // Empty State
         <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed border-border rounded-xl bg-card text-center">
@@ -31,9 +32,12 @@ export function CommunityFeedList({ posts, feedType }: CommunityFeedListProps) {
           )}
         </div>
       ) : (
-        // Active Feed Loop
         posts.map((post) => (
-          <CommunityPostCard key={post.id} post={post as any} />
+          <CommunityPostCard 
+            key={post.id} 
+            post={post as any} 
+            viewMode={viewMode}
+          />
         ))
       )}
     </div>

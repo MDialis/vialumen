@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { LayoutList, AlignJustify } from "lucide-react";
 import {
@@ -7,12 +9,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
-export function CommunityToolbar() {
+interface CommunityToolbarProps {
+  viewMode: "full" | "compact";
+  setViewMode: (mode: "full" | "compact") => void;
+}
+
+const TOGGLE_OPTIONS = [
+  { id: "full", label: "Full", icon: LayoutList },
+  { id: "compact", label: "Compact", icon: AlignJustify },
+] as const;
+
+export function CommunityToolbar({ viewMode, setViewMode }: CommunityToolbarProps) {
   return (
-    <div className=" border-b border-border pb-4">
+    <div className="border-b border-border pb-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        {/* Filters */}
+        {/* Filters Panel */}
         <div className="flex flex-wrap items-center gap-3">
           <Select defaultValue="all">
             <SelectTrigger className="w-[160px] bg-card">
@@ -29,25 +42,29 @@ export function CommunityToolbar() {
           </Select>
         </div>
 
-        {/* View Toggle */}
-        <div className="flex items-center p-1 border border-border rounded-lg bg-muted/30">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-3 flex items-center gap-2 bg-background shadow-sm hover:bg-background"
-          >
-            <LayoutList className="w-4 h-4" />
-            <span className="text-xs font-bold">Full</span>
-          </Button>
+        {/* Modular View Toggle Wrapper */}
+        <div className="flex items-center border border-border rounded-lg bg-muted/30 gap-1">
+          {TOGGLE_OPTIONS.map(({ id, label, icon: Icon }) => {
+            const isActive = viewMode === id;
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-3 flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <AlignJustify className="w-4 h-4" />
-            <span className="text-xs font-medium">Compact</span>
-          </Button>
+            return (
+              <Button
+                key={id}
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode(id)}
+                className={cn(
+                  "h-8 flex items-center transition-all duration-300",
+                  isActive
+                    ? "bg-background shadow-sm hover:bg-background text-foreground font-bold"
+                    : "text-muted-foreground hover:text-foreground font-medium"
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-xs">{label}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </div>
