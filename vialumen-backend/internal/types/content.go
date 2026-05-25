@@ -64,12 +64,15 @@ type CreateCommunityPostRequest struct {
 }
 
 type CommunityPostFeedResponse struct {
-	ID          int        `json:"id"`
-	SubthemeID  int        `json:"subtheme_id"`
-	UserID      string     `json:"user_id"`
-	Title       string     `json:"title"`
-	ContentText string     `json:"content_text"`
-	CreatedAt   *time.Time `json:"created_at"`
-	AuthorName  string     `json:"author_name"`
-	NetVotes    int        `json:"net_votes"`
+	ID             int        `json:"id"`
+	SubthemeID     int        `json:"subtheme_id"`
+	SubthemeName   string     `json:"subtheme_name"`
+	SubthemeSlug   string     `json:"subtheme_slug"`
+	UserID         string     `json:"user_id"`
+	AuthorName     string     `json:"author_name"`
+	AuthorUsername string     `json:"username"`
+	Title          string     `json:"title"`
+	ContentText    string     `json:"content_text"`
+	CreatedAt      *time.Time `json:"created_at"`
+	NetVotes       int        `json:"net_votes"`
 }

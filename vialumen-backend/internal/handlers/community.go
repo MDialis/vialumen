@@ -100,7 +100,7 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	if slug != "" || subthemeID != "" {
 		// --- CONTEXTUAL FEED ---
 		query = `
-			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			SELECT cp.id, cp.subtheme_id, s.title, s.slug, cp.user_id, u.username, cp.title, cp.content_text, cp.created_at, u.name,
 			COALESCE(SUM(v.vote_value), 0) AS net_votes
 			FROM community_posts cp
 			JOIN subthemes s ON cp.subtheme_id = s.id 
@@ -109,7 +109,7 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 			WHERE cp.status = 'published' 
 			AND ($1::text = '' OR s.slug = $1)
 			AND ($2::text = '' OR cp.subtheme_id = $2::int)
-			GROUP BY cp.id, u.name
+			GROUP BY cp.id, s.title, s.slug, u.username, u.name
 			ORDER BY net_votes DESC, cp.created_at DESC
 			LIMIT 15`
 		args = append(args, slug, subthemeID)
@@ -117,18 +117,19 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	} else if feedType == "home" && userID != "" {
 		// --- THE WEIGHTED DISCOVERY FEED (HOME) ---
 		query = `
-			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			SELECT cp.id, cp.subtheme_id, s.title, s.slug, cp.user_id, u.username, cp.title, cp.content_text, cp.created_at, u.name,
 			COALESCE(SUM(v.vote_value), 0) AS net_votes,
 			(
 				(COALESCE(SUM(v.vote_value), 0) * 2.0) 
 				+ CASE WHEN us.user_id IS NOT NULL THEN 50.0 ELSE 0.0 END 
 			) / POWER(EXTRACT(EPOCH FROM (NOW() - cp.created_at))/3600 + 2, 1.5) AS dynamic_score
 			FROM community_posts cp
+			JOIN subthemes s ON cp.subtheme_id = s.id 
 			LEFT JOIN "users" u ON cp.user_id = u.id
 			LEFT JOIN community_post_votes v ON cp.id = v.post_id
 			LEFT JOIN user_subscriptions us ON cp.subtheme_id = us.subtheme_id AND us.user_id = $1
 			WHERE cp.status = 'published'
-			GROUP BY cp.id, u.name, us.user_id
+			GROUP BY cp.id, s.title, s.slug, u.username, u.name, us.user_id
 			ORDER BY dynamic_score DESC
 			LIMIT 50`
 		args = append(args, userID)
@@ -136,14 +137,15 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// --- TRENDING / DEFAULT ---
 		query = `
-			SELECT cp.id, cp.subtheme_id, cp.user_id, cp.title, cp.content_text, cp.created_at, u.name,
+			SELECT cp.id, cp.subtheme_id, s.title, s.slug, cp.user_id, u.username, cp.title, cp.content_text, cp.created_at, u.name,
 			COALESCE(SUM(v.vote_value), 0) AS net_votes,
 			(COALESCE(SUM(v.vote_value), 0) / POWER(EXTRACT(EPOCH FROM (NOW() - cp.created_at))/3600 + 2, 1.8)) AS hot_score
 			FROM community_posts cp
+			JOIN subthemes s ON cp.subtheme_id = s.id 
 			LEFT JOIN "users" u ON cp.user_id = u.id
 			LEFT JOIN community_post_votes v ON cp.id = v.post_id
 			WHERE cp.status = 'published'
-			GROUP BY cp.id, u.name
+			GROUP BY cp.id, s.title, s.slug, u.username, u.name
 			ORDER BY hot_score DESC
 			LIMIT 50`
 	}
@@ -160,12 +162,13 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var p types.CommunityPostFeedResponse
 		var authorName *string
+		var authorUsername *string
 		var dummyScore float64
 
-		if subthemeID != "" {
-			err = rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes)
+		if slug != "" || subthemeID != "" {
+			err = rows.Scan(&p.ID, &p.SubthemeID, &p.SubthemeName, &p.SubthemeSlug, &p.UserID, &authorUsername, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes)
 		} else {
-			err = rows.Scan(&p.ID, &p.SubthemeID, &p.UserID, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes, &dummyScore)
+			err = rows.Scan(&p.ID, &p.SubthemeID, &p.SubthemeName, &p.SubthemeSlug, &p.UserID, &authorUsername, &p.Title, &p.ContentText, &p.CreatedAt, &authorName, &p.NetVotes, &dummyScore)
 		}
 
 		if err != nil {
@@ -173,10 +176,18 @@ func (h *Handler) GetCommunityPosts(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// Handle missing Display Name
 		if authorName != nil {
 			p.AuthorName = *authorName
 		} else {
-			p.AuthorName = "[Deleted User]"
+			p.AuthorName = "Deleted User"
+		}
+
+		// Handle missing Username
+		if authorUsername != nil {
+			p.AuthorUsername = *authorUsername
+		} else {
+			p.AuthorUsername = "deleted"
 		}
 
 		posts = append(posts, p)

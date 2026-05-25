@@ -141,10 +141,13 @@ export interface FormContributor {
 export interface CommunityPostFeedResponse {
   id: number;
   subtheme_id: number;
+  subtheme_name: string;
+  subtheme_slug: string;
   user_id: string;
+  author_name: string;
+  username: string;
   title: string;
   content_text: string;
   created_at: string;
-  author_name: string;
   net_votes: number;
 }
