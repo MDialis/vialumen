@@ -19,6 +19,7 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 
 	var response types.OfficialPageResponse
 	response.Blocks = []types.ContentBlockResponse{}
+	response.Hierarchies = []types.HierarchySimple{}
 
 	// Fetch the Base Subtheme Info
 	err := h.DB.QueryRow(`
@@ -34,6 +35,26 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 		log.Printf("Error fetching subtheme: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
+	}
+
+	// Fetch the Hierarchies this subtheme belongs to
+	hierarchiesQuery := `
+		SELECT h.id, h.title 
+		FROM hierarchies h
+		JOIN subtheme_hierarchies sh ON h.id = sh.hierarchy_id
+		WHERE sh.subtheme_id = $1
+	`
+	hRows, err := h.DB.Query(hierarchiesQuery, response.ID)
+	if err != nil {
+		log.Printf("Error fetching hierarchies: %v", err)
+	} else {
+		defer hRows.Close()
+		for hRows.Next() {
+			var hs types.HierarchySimple
+			if err := hRows.Scan(&hs.ID, &hs.Title); err == nil {
+				response.Hierarchies = append(response.Hierarchies, hs)
+			}
+		}
 	}
 
 	// Fetch ALL Active Versions for this Subtheme AND check for older versions
@@ -81,6 +102,7 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 			block.Contributors = append(block.Contributors, c)
 		}
 
+		// Fetch Sources
 		sRows, _ := h.DB.Query(`SELECT title, url FROM sources WHERE official_version_id = $1`, block.VersionID)
 		defer sRows.Close()
 		for sRows.Next() {
@@ -89,7 +111,7 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 			block.Sources = append(block.Sources, s)
 		}
 
-		// Append the fully populated block to the page response
+		// Append the fully populated block
 		response.Blocks = append(response.Blocks, block)
 	}
 

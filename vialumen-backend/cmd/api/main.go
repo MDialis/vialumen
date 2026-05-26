@@ -60,7 +60,8 @@ func main() {
 	mux.HandleFunc("GET /api/hierarchies/{id}/subthemes", appHandler.GetSubthemesByHierarchy)
 
 	// OFFICIAL CONTENT
-	mux.HandleFunc("GET /api/path/{slug}", appHandler.GetOfficialSubthemeBySlug)
+	mux.HandleFunc("GET /api/path/{slug}", appHandler.GetSubthemePathNodes)
+	mux.HandleFunc("GET /api/path/{slug}/content", appHandler.GetOfficialSubthemeBySlug)
 	mux.HandleFunc("GET /api/path/{slug}/{contentType}", appHandler.GetVersionHistory)
 	mux.HandleFunc("GET /api/version/{id}", appHandler.GetSpecificVersion)
 

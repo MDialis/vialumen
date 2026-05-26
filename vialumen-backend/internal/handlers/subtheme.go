@@ -149,6 +149,129 @@ func (h *Handler) GetSubthemesConnectionsByHierarchy(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
+func (h *Handler) GetSubthemePathNodes(w http.ResponseWriter, r *http.Request) {
+	slug := r.PathValue("slug")
+	if slug == "" {
+		http.Error(w, "Slug is required", http.StatusBadRequest)
+		return
+	}
+
+	// Fetch all Edges (Connections) going strictly UP to the root and DOWN to the leaves.
+	edgesQuery := `
+		WITH RECURSIVE target AS (
+			SELECT id FROM subthemes WHERE slug = $1
+		),
+		children_cte AS (
+			-- Base Case: Direct children
+			SELECT source_subtheme_id, target_subtheme_id
+			FROM subtheme_connections
+			WHERE source_subtheme_id = (SELECT id FROM target)
+			
+			UNION ALL
+			
+			-- Recursive: Children of children
+			SELECT sc.source_subtheme_id, sc.target_subtheme_id
+			FROM subtheme_connections sc
+			JOIN children_cte c ON sc.source_subtheme_id = c.target_subtheme_id
+		),
+		parents_cte AS (
+			-- Base Case: Direct parents
+			SELECT source_subtheme_id, target_subtheme_id
+			FROM subtheme_connections
+			WHERE target_subtheme_id = (SELECT id FROM target)
+			
+			UNION ALL
+			
+			-- Recursive: Parents of parents (A single line up, ignoring siblings)
+			SELECT sc.source_subtheme_id, sc.target_subtheme_id
+			FROM subtheme_connections sc
+			JOIN parents_cte p ON sc.target_subtheme_id = p.source_subtheme_id
+		)
+		SELECT source_subtheme_id, target_subtheme_id FROM children_cte
+		UNION
+		SELECT source_subtheme_id, target_subtheme_id FROM parents_cte
+	`
+
+	edgeRows, err := h.DB.Query(edgesQuery, slug)
+	if err != nil {
+		log.Printf("Error querying specific path edges: %v", err)
+		http.Error(w, "Failed to fetch path connections", http.StatusInternalServerError)
+		return
+	}
+	defer edgeRows.Close()
+
+	var edges []types.Connection
+	for edgeRows.Next() {
+		var conn types.Connection
+		if err := edgeRows.Scan(&conn.Source, &conn.Target); err != nil {
+			log.Printf("Error scanning edge row: %v", err)
+			continue
+		}
+		edges = append(edges, conn)
+	}
+
+	// Fetch the Nodes (Subthemes) that belong to those specific edges
+	nodesQuery := `
+		WITH RECURSIVE target AS (
+			SELECT id FROM subthemes WHERE slug = $1
+		),
+		children_cte AS (
+			SELECT source_subtheme_id, target_subtheme_id FROM subtheme_connections WHERE source_subtheme_id = (SELECT id FROM target)
+			UNION ALL
+			SELECT sc.source_subtheme_id, sc.target_subtheme_id FROM subtheme_connections sc JOIN children_cte c ON sc.source_subtheme_id = c.target_subtheme_id
+		),
+		parents_cte AS (
+			SELECT source_subtheme_id, target_subtheme_id FROM subtheme_connections WHERE target_subtheme_id = (SELECT id FROM target)
+			UNION ALL
+			SELECT sc.source_subtheme_id, sc.target_subtheme_id FROM subtheme_connections sc JOIN parents_cte p ON sc.target_subtheme_id = p.source_subtheme_id
+		),
+		all_edges AS (
+			SELECT source_subtheme_id as src, target_subtheme_id as tgt FROM children_cte
+			UNION
+			SELECT source_subtheme_id, target_subtheme_id FROM parents_cte
+		),
+		involved_nodes AS (
+			SELECT src AS node_id FROM all_edges
+			UNION
+			SELECT tgt FROM all_edges
+			UNION
+			SELECT id FROM target -- Ensures the target itself is loaded even if it has no children or parents
+		)
+		SELECT s.id, s.title, s.slug, s.created_at
+		FROM subthemes s
+		JOIN involved_nodes n ON s.id = n.node_id;
+	`
+
+	nodeRows, err := h.DB.Query(nodesQuery, slug)
+	if err != nil {
+		log.Printf("Error querying specific path nodes: %v", err)
+		http.Error(w, "Failed to fetch path nodes", http.StatusInternalServerError)
+		return
+	}
+	defer nodeRows.Close()
+
+	var nodes []types.SubthemeSimpleResponse
+	for nodeRows.Next() {
+		var st types.SubthemeSimpleResponse
+		// Removed &st.Description from the Scan parameters to match the updated SELECT
+		if err := nodeRows.Scan(&st.ID, &st.Title, &st.Slug, &st.CreatedAt); err != nil {
+			log.Printf("Error scanning node row: %v", err)
+			continue
+		}
+		nodes = append(nodes, st)
+	}
+
+	// Package and send the exact same DTO the main graph uses
+	response := types.HierarchyNodeResponse{
+		Nodes: nodes,
+		Edges: edges,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
 // ----- POST Functions -----
 func (h *Handler) CreateSubtheme(w http.ResponseWriter, r *http.Request) {
 	var req types.CreateSubthemeRequest

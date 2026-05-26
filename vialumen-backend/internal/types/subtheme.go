@@ -60,6 +60,18 @@ type SubthemeResponse struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type HierarchyNodeResponse struct {
+	Nodes []SubthemeSimpleResponse `json:"nodes"`
+	Edges []Connection             `json:"edges"`
+}
+
+type SubthemeSimpleResponse struct {
+	ID        int        `json:"id"`
+	Title     string     `json:"title"`
+	Slug      string     `json:"slug"`
+	CreatedAt *time.Time `json:"created_at"`
+}
+
 type Connection struct {
 	Source int `json:"source"`
 	Target int `json:"target"`
@@ -70,11 +82,17 @@ type HierarchyGraphResponse struct {
 	Edges []Connection       `json:"edges"`
 }
 
+type HierarchySimple struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+}
+
 type OfficialPageResponse struct {
 	ID          int                    `json:"id"`
 	Title       string                 `json:"title"`
 	Slug        string                 `json:"slug"`
-	Description *string                `json:"description"`
+	Description string                 `json:"description"`
+	Hierarchies []HierarchySimple      `json:"hierarchies"`
 	Blocks      []ContentBlockResponse `json:"blocks"`
 }
 
