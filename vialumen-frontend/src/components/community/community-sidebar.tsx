@@ -12,7 +12,7 @@ const NAV_FEEDS = [
   },
   {
     id: "trending",
-    label: "Trending",
+    label: "Trending Posts",
     icon: Flame,
     href: "/community?feed=trending",
   },
