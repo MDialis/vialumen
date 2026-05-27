@@ -324,3 +324,25 @@ export async function postCommunityContent(
     return false;
   }
 }
+
+export async function castVote(postId: number, voteValue: number, token: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API}/community/${postId}/vote`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ vote_value: voteValue }),
+    });
+
+    if (!response.ok) {
+      console.error(`Vote failed: ${response.status}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Network error posting vote:", error);
+    return false;
+  }
+}

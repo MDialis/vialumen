@@ -8,9 +8,15 @@ interface CommunityFeedListProps {
   posts: CommunityPostFeedResponse[] | null;
   feedType: string;
   viewMode: "full" | "compact";
+  token: string;
 }
 
-export function CommunityFeedList({ posts, feedType, viewMode }: CommunityFeedListProps) {
+export function CommunityFeedList({
+  posts,
+  feedType,
+  viewMode,
+  token,
+}: CommunityFeedListProps) {
   return (
     <div className="flex flex-col gap-6 pt-2 mt-2">
       {!posts || posts.length === 0 ? (
@@ -33,10 +39,11 @@ export function CommunityFeedList({ posts, feedType, viewMode }: CommunityFeedLi
         </div>
       ) : (
         posts.map((post) => (
-          <CommunityPostCard 
-            key={post.id} 
-            post={post as any} 
+          <CommunityPostCard
+            key={post.id}
+            post={post as any}
             viewMode={viewMode}
+            token={token}
           />
         ))
       )}

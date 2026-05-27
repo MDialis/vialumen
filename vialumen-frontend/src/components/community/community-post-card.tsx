@@ -1,8 +1,10 @@
+"use client";
+
 import { CommunityPostFeedResponse } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { MessageSquare, User, ChevronUp, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import Link from "next/link"; // Ensure Link is imported
+import { User } from "lucide-react";
+import Link from "next/link";
+import { VoteActions } from "./vote-actions";
 
 function timeAgo(dateString: string) {
   const date = new Date(dateString);
@@ -21,12 +23,12 @@ function timeAgo(dateString: string) {
 interface CommunityPostCardProps {
   post: CommunityPostFeedResponse;
   viewMode?: "full" | "compact";
+  token: string;
 }
 
-export function CommunityPostCard({ post, viewMode = "full" }: CommunityPostCardProps) {
+export function CommunityPostCard({ post, viewMode = "full", token }: CommunityPostCardProps) {
   const isCompact = viewMode === "compact";
 
-  // Fallbacks just in case the backend hasn't updated yet
   const profileLink = `/profile/${post.username}`;
   const communityLink = `/community/${post.subtheme_slug || post.subtheme_id}`;
 
@@ -58,30 +60,11 @@ export function CommunityPostCard({ post, viewMode = "full" }: CommunityPostCard
 
           {/* Title */}
           <CardTitle className="text-base font-bold leading-snug tracking-tight text-foreground">
-            {post.title}
-          </CardTitle>
+              {post.title}
+            </CardTitle>
 
           {/* Interactive Actions */}
-          <div className="flex items-center gap-2">
-            {/* Net Vote Counter */}
-            <div className="flex items-center bg-muted/60 rounded-full p-0.5">
-              <button className="p-0.5 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-                <ChevronUp className="w-6 h-6" />
-              </button>
-              <span className="font-bold text-foreground min-w-[1.25rem] text-center">
-                {post.net_votes}
-              </span>
-              <button className="p-0.5 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-                <ChevronDown className="w-6 h-6" />
-              </button>
-            </div>
-
-            {/* Comments Button */}
-            <button className="flex items-center bg-muted/60 gap-1.5 py-1.5 px-3 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-              <MessageSquare className="w-5 h-5" />
-              <span className="font-bold">0</span> {/* Comment count */}
-            </button>
-          </div>
+          <VoteActions postId={post.id} initialVotes={post.net_votes} token={token} viewMode="compact" />
         </div>
       </Card>
     );
@@ -111,10 +94,10 @@ export function CommunityPostCard({ post, viewMode = "full" }: CommunityPostCard
             <span>•</span>
             <span suppressHydrationWarning>{timeAgo(post.created_at)}</span>
           </div>
-
+          
           <CardTitle className="text-xl font-bold leading-snug tracking-tight text-foreground">
-            {post.title}
-          </CardTitle>
+              {post.title}
+            </CardTitle>
         </div>
       </CardHeader>
 
@@ -125,27 +108,7 @@ export function CommunityPostCard({ post, viewMode = "full" }: CommunityPostCard
       </CardContent>
 
       <CardFooter>
-        {/* Interactive Actions */}
-        <div className="flex items-center gap-2">
-          {/* Net Vote Counter */}
-          <div className="flex items-center bg-muted/60 rounded-full p-1">
-            <button className="p-1 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-              <ChevronUp className="w-6 h-6" />
-            </button>
-            <span className="font-bold text-foreground min-w-[1.25rem] text-center">
-              {post.net_votes}
-            </span>
-            <button className="p-1 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-              <ChevronDown className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Comments Button */}
-          <button className="flex items-center bg-muted/60 gap-1.5 py-2.5 px-4 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
-            <MessageSquare className="w-5 h-5" />
-            <span className="font-bold">0</span> {/* Comment count */}
-          </button>
-        </div>
+        <VoteActions postId={post.id} initialVotes={post.net_votes} token={token} viewMode="full" />
       </CardFooter>
     </Card>
   );

@@ -1,10 +1,9 @@
-import { getCommunityPosts } from "@/lib/api";
-import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { CommunitySidebar } from "@/components/community/community-sidebar";
 import { CommunityFeedClient } from "@/components/community/community-feed-client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CommunitySidebar } from "@/components/community/community-sidebar";
+import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
+import { getCommunityPosts } from "@/lib/api";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth"; 
 
 export default async function CommunityFeedPage({
   searchParams,
@@ -12,12 +11,10 @@ export default async function CommunityFeedPage({
   searchParams: Promise<{ feed?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
-
   const feedType = (resolvedSearchParams.feed as "home" | "trending") || "home";
 
-  // const sessionData = await auth.api.getSession({ headers: await headers() });
-  // const token = sessionData?.session?.token;
-  const token = undefined; // Placeholder until auth is active
+  const sessionData = await auth.api.getSession({ headers: await headers() });
+  const token = sessionData?.session?.token || "";
 
   const posts = await getCommunityPosts({
     feed: feedType,
@@ -40,7 +37,7 @@ export default async function CommunityFeedPage({
           {/* CENTER COLUMN: MAIN FEED           */}
           {/* ================================== */}
           <main className="flex-1 max-w-4xl mx-auto w-full">
-            <CommunityFeedClient posts={posts} feedType={feedType} />
+            <CommunityFeedClient posts={posts} feedType={feedType} token={token} />
           </main>
 
           {/* ================================== */}
