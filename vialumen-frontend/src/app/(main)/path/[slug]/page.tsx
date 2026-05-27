@@ -1,7 +1,10 @@
 import { ThemeWrapper } from "@/components/appearance/theme-wrapper";
-import { getOfficialSubthemeBySlug, getCommunityPosts } from "@/lib/api";
+import { 
+  getOfficialSubthemeBySlug, 
+  getCommunityPosts, 
+  getSubthemePathNodes
+} from "@/lib/api";
 import ContentGroup from "@/components/path/path-group";
-// import { OfficialPageResponse } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
@@ -10,33 +13,63 @@ import ContentToolbar from "@/components/path/path-toolbar";
 import { TrendingPostsSidebar } from "@/components/community/trending-posts-sidebar";
 import { PathNavigationSidebar } from "@/components/path/path-navigation-sidebar";
 
+const MASLOW_ORDER = ["physiology", "safety", "belonging", "esteem", "actualization"];
+
 export default async function PathPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ theme?: string }>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
 
-  // Fetch Official Content and Community Posts in parallel
-  const [content, trendingPosts] = await Promise.all([
-    getOfficialSubthemeBySlug(resolvedParams.slug),
-    getCommunityPosts({ feed: "trending", slug: resolvedParams.slug }),
-  ]);
+  // Fetch Official Content
+  const content = await getOfficialSubthemeBySlug(resolvedParams.slug);
 
   if (!content) {
     notFound();
   }
 
+  // ==========================================
+  // CANONICAL HIERARCHY LOGIC
+  // ==========================================
+  let activeThemeId = resolvedSearchParams.theme;
+  const hierarchies = content.hierarchies || [];
+  
+  const isValidTheme = hierarchies.some((h) => h.id === activeThemeId);
+
+  if (!activeThemeId || !isValidTheme) {
+    const fallbackId = MASLOW_ORDER.find((level) => 
+      hierarchies.some((h) => h.id === level)
+    );
+    activeThemeId = fallbackId || hierarchies[0]?.id || "unknown";
+  }
+
+  const activeTheme = hierarchies.find((h) => h.id === activeThemeId) || hierarchies[0];
+
+  // Fetch Graph Lineage (using activeTheme) and Community Posts in parallel
+  const [trendingPosts, graphData] = await Promise.all([
+    getCommunityPosts({ feed: "trending", slug: resolvedParams.slug }),
+    getSubthemePathNodes(resolvedParams.slug, activeThemeId),
+  ]);
+
   return (
     <ThemeWrapper>
       <div className="min-h-screen p-4 md:p-8 bg-background text-foreground transition-colors duration-300">
-        <div className="mx-auto flex flex-col lg:flex-row gap-4">
+        <div className="mx-auto flex flex-col lg:flex-row gap-4 max-w-[1920px]">
           {/* ================================== */}
           {/* LEFT: NAVIGATION                   */}
           {/* ================================== */}
-          <aside className="hidden lg:block w-60 flex-shrink-0">
-            {/* Pass the slug or ID so the sidebar knows what to highlight */}
-            <PathNavigationSidebar currentSlug={content.slug} />
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <PathNavigationSidebar 
+              currentSlug={content.slug}
+              currentTitle={content.title}
+              activeTheme={activeTheme}
+              availableThemes={hierarchies}
+              graphData={graphData}
+            />
           </aside>
 
           {/* ================================== */}
@@ -46,7 +79,7 @@ export default async function PathPage({
             {content.blocks && content.blocks.length > 0 ? (
               <ContentProvider blocks={content.blocks} slug={content.slug}>
                 <div className="flex items-center justify-between p-2">
-                  <h1 className="text-4xl font-black text-foreground">
+                  <h1 className="text-4xl font-bold tracking-tight text-foreground">
                     {content.title}
                   </h1>
                   <div>

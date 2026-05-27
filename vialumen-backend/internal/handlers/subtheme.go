@@ -156,43 +156,47 @@ func (h *Handler) GetSubthemePathNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch all Edges (Connections) going strictly UP to the root and DOWN to the leaves.
+	// Grab the optional hierarchy_id from the URL (e.g., ?hierarchy_id=5)
+	hierarchyID := r.URL.Query().Get("hierarchy_id")
+
+	// Fetch Edges
 	edgesQuery := `
 		WITH RECURSIVE target AS (
 			SELECT id FROM subthemes WHERE slug = $1
 		),
-		children_cte AS (
-			-- Base Case: Direct children
-			SELECT source_subtheme_id, target_subtheme_id
-			FROM subtheme_connections
-			WHERE source_subtheme_id = (SELECT id FROM target)
-			
-			UNION ALL
-			
-			-- Recursive: Children of children
+		valid_connections AS (
 			SELECT sc.source_subtheme_id, sc.target_subtheme_id
 			FROM subtheme_connections sc
-			JOIN children_cte c ON sc.source_subtheme_id = c.target_subtheme_id
+			WHERE $2::text = '' OR (
+				EXISTS (SELECT 1 FROM subtheme_hierarchies sh WHERE sh.subtheme_id = sc.source_subtheme_id AND sh.hierarchy_id = $2::text)
+				AND 
+				EXISTS (SELECT 1 FROM subtheme_hierarchies sh WHERE sh.subtheme_id = sc.target_subtheme_id AND sh.hierarchy_id = $2::text)
+			)
+		),
+		children_cte AS (
+			SELECT source_subtheme_id, target_subtheme_id
+			FROM valid_connections
+			WHERE source_subtheme_id = (SELECT id FROM target)
+			UNION ALL
+			SELECT vc.source_subtheme_id, vc.target_subtheme_id
+			FROM valid_connections vc
+			JOIN children_cte c ON vc.source_subtheme_id = c.target_subtheme_id
 		),
 		parents_cte AS (
-			-- Base Case: Direct parents
 			SELECT source_subtheme_id, target_subtheme_id
-			FROM subtheme_connections
+			FROM valid_connections
 			WHERE target_subtheme_id = (SELECT id FROM target)
-			
 			UNION ALL
-			
-			-- Recursive: Parents of parents (A single line up, ignoring siblings)
-			SELECT sc.source_subtheme_id, sc.target_subtheme_id
-			FROM subtheme_connections sc
-			JOIN parents_cte p ON sc.target_subtheme_id = p.source_subtheme_id
+			SELECT vc.source_subtheme_id, vc.target_subtheme_id
+			FROM valid_connections vc
+			JOIN parents_cte p ON vc.target_subtheme_id = p.source_subtheme_id
 		)
 		SELECT source_subtheme_id, target_subtheme_id FROM children_cte
 		UNION
 		SELECT source_subtheme_id, target_subtheme_id FROM parents_cte
 	`
 
-	edgeRows, err := h.DB.Query(edgesQuery, slug)
+	edgeRows, err := h.DB.Query(edgesQuery, slug, hierarchyID)
 	if err != nil {
 		log.Printf("Error querying specific path edges: %v", err)
 		http.Error(w, "Failed to fetch path connections", http.StatusInternalServerError)
@@ -210,20 +214,29 @@ func (h *Handler) GetSubthemePathNodes(w http.ResponseWriter, r *http.Request) {
 		edges = append(edges, conn)
 	}
 
-	// Fetch the Nodes (Subthemes) that belong to those specific edges
+	// Fetch Nodes
 	nodesQuery := `
 		WITH RECURSIVE target AS (
 			SELECT id FROM subthemes WHERE slug = $1
 		),
+		valid_connections AS (
+			SELECT sc.source_subtheme_id, sc.target_subtheme_id
+			FROM subtheme_connections sc
+			WHERE $2::text = '' OR (
+				EXISTS (SELECT 1 FROM subtheme_hierarchies sh WHERE sh.subtheme_id = sc.source_subtheme_id AND sh.hierarchy_id = $2::text)
+				AND 
+				EXISTS (SELECT 1 FROM subtheme_hierarchies sh WHERE sh.subtheme_id = sc.target_subtheme_id AND sh.hierarchy_id = $2::text)
+			)
+		),
 		children_cte AS (
-			SELECT source_subtheme_id, target_subtheme_id FROM subtheme_connections WHERE source_subtheme_id = (SELECT id FROM target)
+			SELECT source_subtheme_id, target_subtheme_id FROM valid_connections WHERE source_subtheme_id = (SELECT id FROM target)
 			UNION ALL
-			SELECT sc.source_subtheme_id, sc.target_subtheme_id FROM subtheme_connections sc JOIN children_cte c ON sc.source_subtheme_id = c.target_subtheme_id
+			SELECT vc.source_subtheme_id, vc.target_subtheme_id FROM valid_connections vc JOIN children_cte c ON vc.source_subtheme_id = c.target_subtheme_id
 		),
 		parents_cte AS (
-			SELECT source_subtheme_id, target_subtheme_id FROM subtheme_connections WHERE target_subtheme_id = (SELECT id FROM target)
+			SELECT source_subtheme_id, target_subtheme_id FROM valid_connections WHERE target_subtheme_id = (SELECT id FROM target)
 			UNION ALL
-			SELECT sc.source_subtheme_id, sc.target_subtheme_id FROM subtheme_connections sc JOIN parents_cte p ON sc.target_subtheme_id = p.source_subtheme_id
+			SELECT vc.source_subtheme_id, vc.target_subtheme_id FROM valid_connections vc JOIN parents_cte p ON vc.target_subtheme_id = p.source_subtheme_id
 		),
 		all_edges AS (
 			SELECT source_subtheme_id as src, target_subtheme_id as tgt FROM children_cte
@@ -235,14 +248,14 @@ func (h *Handler) GetSubthemePathNodes(w http.ResponseWriter, r *http.Request) {
 			UNION
 			SELECT tgt FROM all_edges
 			UNION
-			SELECT id FROM target -- Ensures the target itself is loaded even if it has no children or parents
+			SELECT id FROM target 
 		)
 		SELECT s.id, s.title, s.slug, s.created_at
 		FROM subthemes s
 		JOIN involved_nodes n ON s.id = n.node_id;
 	`
 
-	nodeRows, err := h.DB.Query(nodesQuery, slug)
+	nodeRows, err := h.DB.Query(nodesQuery, slug, hierarchyID)
 	if err != nil {
 		log.Printf("Error querying specific path nodes: %v", err)
 		http.Error(w, "Failed to fetch path nodes", http.StatusInternalServerError)

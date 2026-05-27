@@ -95,12 +95,17 @@ export async function getSubthemes(): Promise<SubthemeSimple[] | null> {
   }
 }
 
-// NEW: Fetches the Parent -> Current -> Son Lineage Graph
 export async function getSubthemePathNodes(
   slug: string,
+  hierarchyId?: string
 ): Promise<HierarchyGraphResponse | null> {
   try {
-    const response = await fetch(`${API}/path/${slug}`);
+    // Append the query param if it exists
+    const url = hierarchyId 
+      ? `${API}/path/${slug}?hierarchy_id=${hierarchyId}`
+      : `${API}/path/${slug}`;
+
+    const response = await fetch(url);
     if (!response.ok) return null;
     return await response.json();
   } catch (error) {
