@@ -2,7 +2,7 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { 
   UserSearchResult, 
-  CreateCommunityPostPayload, 
+  CreateCommunityPostRequest, 
   SourceRequest,
   FormContributor
 } from "@/types";
@@ -71,7 +71,7 @@ export function useCommunityPostForm(token: string) {
     if (!title.trim()) return setStatus({ error: "Your post needs a title." });
     if (!contentText.trim()) return setStatus({ error: "Your post needs some content." });
 
-    const payload: CreateCommunityPostPayload = {
+    const payload: CreateCommunityPostRequest = {
       subtheme_id: Number(subthemeId),
       title: title.trim(),
       content_text: contentText,

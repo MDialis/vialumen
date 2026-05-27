@@ -120,7 +120,6 @@ func (h *Handler) GetOfficialSubthemeBySlug(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(response)
 }
 
-// GetVersionHistory gets a lightweight list of past edits for a specific content type
 func (h *Handler) GetVersionHistory(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 	contentType := r.PathValue("contentType")

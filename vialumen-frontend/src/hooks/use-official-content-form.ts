@@ -2,7 +2,7 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { 
   UserSearchResult, 
-  CreateOfficialVersionPayload, 
+  CreateOfficialVersionRequest, 
   SourceRequest,
   FormContributor
 } from "@/types"; 
@@ -80,7 +80,7 @@ export function useOfficialContentForm(token: string) {
       return setStatus({ error: "Content Type and Body are required." });
     }
 
-    const payload: CreateOfficialVersionPayload = {
+    const payload: CreateOfficialVersionRequest = {
       subtheme_id: Number(subthemeId),
       content_type: contentType.trim(),
       content_text: contentText,

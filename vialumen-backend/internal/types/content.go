@@ -76,3 +76,7 @@ type CommunityPostFeedResponse struct {
 	CreatedAt      *time.Time `json:"created_at"`
 	NetVotes       int        `json:"net_votes"`
 }
+
+type VoteRequest struct {
+	VoteValue int `json:"vote_value"` // Expects 1, -1, or 0
+}

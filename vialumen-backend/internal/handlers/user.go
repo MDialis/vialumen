@@ -61,7 +61,6 @@ func (h *Handler) SearchAllUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
-// GetUserProfile fetches public profile data by username
 func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract the username from the URL
 	username := r.PathValue("username")
