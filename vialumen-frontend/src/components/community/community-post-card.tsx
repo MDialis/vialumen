@@ -175,10 +175,7 @@ export function CommunityPostCard({
   // FULL VIEW
   // ==========================================
   return (
-    <Card
-      onClick={handleCardClick}
-      className="cursor-pointer border-border bg-card hover:border-primary/40 transition-colors duration-200"
-    >
+    <Card className="py-3">
       <CardHeader className="flex flex-row items-start justify-between">
         <div className="w-full">
           {/* Subtheme • Username • Timestamp */}
@@ -202,13 +199,9 @@ export function CommunityPostCard({
             <span suppressHydrationWarning>{timeAgo(post.created_at)}</span>
           </div>
 
-          <div onClick={(e) => e.stopPropagation()}>
-            <Link href={postDetailLink}>
-              <CardTitle className="text-xl font-bold leading-snug tracking-tight text-foreground">
-                {post.title}
-              </CardTitle>
-            </Link>
-          </div>
+          <CardTitle className="text-xl font-bold leading-snug tracking-tight text-foreground">
+            {post.title}
+          </CardTitle>
         </div>
       </CardHeader>
 

@@ -71,7 +71,7 @@ export interface OfficialPageResponse {
   slug: string;
   description?: string;
   blocks: ContentBlockResponse[];
-  hierarchies: HierarchySimple[]; // Now receives an array of hierarchies
+  hierarchies: HierarchySimple[];
 }
 
 // =========================
@@ -126,6 +126,23 @@ export interface CommunityPostFeedResponse {
   content_text: string;
   created_at: string;
   net_votes: number;
+  comment_count: number;
+}
+
+export interface PostCommentResponse {
+  id: number;
+  post_id: number;
+  user_id: string;
+  username: string;
+  author_name: string;
+  content_text: string;
+  created_at: string;
+  net_votes: number;
+}
+
+export interface CommunityPostDetailResponse {
+  post: CommunityPostFeedResponse; 
+  comments: PostCommentResponse[];
 }
 
 // =========================
@@ -170,4 +187,12 @@ export interface FormContributor {
   searchQuery: string;
   searchResults: UserSearchResult[];
   isSearching: boolean;
+}
+
+export interface VoteRequest {
+  vote_value: number;
+}
+
+export interface CreateCommentRequest {
+  content_text: string;
 }

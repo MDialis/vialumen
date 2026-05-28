@@ -10,6 +10,10 @@ import {
   CreateOfficialVersionRequest,
   CreateCommunityPostRequest,
   CommunityPostFeedResponse,
+  CreateCommentRequest,
+  VoteRequest,
+  PostCommentResponse,
+  CommunityPostDetailResponse,
 } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API;
@@ -268,6 +272,37 @@ export async function getCommunityPosts(
   }
 }
 
+export async function getCommunityPostDetail(
+  postId: string,
+  token?: string
+): Promise<CommunityPostDetailResponse | null> {
+  try {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API}/community/${postId}`, {
+      method: "GET",
+      headers,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch post detail: ${response.status}`);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Network error fetching post details:", error);
+    return null;
+  }
+}
+
 // =========================
 // POST ACTIONS
 // =========================
@@ -325,15 +360,21 @@ export async function postCommunityContent(
   }
 }
 
-export async function castVote(postId: number, voteValue: number, token: string): Promise<boolean> {
+export async function castPostVote(
+  postId: number,
+  voteValue: 1 | -1 | 0,
+  token: string
+): Promise<boolean> {
   try {
+    const payload: VoteRequest = { vote_value: voteValue };
+    
     const response = await fetch(`${API}/community/${postId}/vote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify({ vote_value: voteValue }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -343,6 +384,50 @@ export async function castVote(postId: number, voteValue: number, token: string)
     return true;
   } catch (error) {
     console.error("Network error posting vote:", error);
+    return false;
+  }
+}
+
+export async function postComment(postId: number, content: string, token: string): Promise<PostCommentResponse | null> {
+  try {
+    const payload: CreateCommentRequest = { content_text: content };
+    const response = await fetch(`${API}/community/${postId}/comments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) return null;
+    
+    return await response.json(); 
+  } catch (error) {
+    console.error("Network error posting comment:", error);
+    return null;
+  }
+}
+
+export async function castCommentVote(commentId: number, voteValue: number, token: string): Promise<boolean> {
+  try {
+    const payload: VoteRequest = { vote_value: voteValue };
+    const response = await fetch(`${API}/community/comments/${commentId}/vote`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      console.error(`Comment vote failed: ${response.status}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Network error posting comment vote:", error);
     return false;
   }
 }
