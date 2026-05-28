@@ -37,7 +37,7 @@ export function CommunityPostCard({ post, viewMode = "full", token }: CommunityP
   // ==========================================
   if (isCompact) {
     return (
-      <Card className="hover:border-primary/40 transition-colors duration-200 w-full py-3 px-4 shadow-sm">
+      <Card className="hover:border-primary/40 transition-colors duration-200 w-full py-3 px-4">
         <div className="flex flex-col gap-1.5 w-full">
 
           {/* Subtheme • Username • Timestamp */}
@@ -64,7 +64,7 @@ export function CommunityPostCard({ post, viewMode = "full", token }: CommunityP
             </CardTitle>
 
           {/* Interactive Actions */}
-          <VoteActions postId={post.id} initialVotes={post.net_votes} token={token} viewMode="compact" />
+          <VoteActions postId={post.id} initialVotes={post.net_votes} commentsCount={post.comment_count} token={token} viewMode="compact" />
         </div>
       </Card>
     );
@@ -108,7 +108,7 @@ export function CommunityPostCard({ post, viewMode = "full", token }: CommunityP
       </CardContent>
 
       <CardFooter>
-        <VoteActions postId={post.id} initialVotes={post.net_votes} token={token} viewMode="full" />
+        <VoteActions postId={post.id} initialVotes={post.net_votes} commentsCount={post.comment_count} token={token} viewMode="full" />
       </CardFooter>
     </Card>
   );

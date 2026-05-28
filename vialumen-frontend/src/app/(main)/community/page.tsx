@@ -24,7 +24,6 @@ export default async function CommunityFeedPage({
   return (
     <ThemeWrapper>
       <div className="min-h-screen p-4 md:p-8 bg-background text-foreground transition-colors duration-300">
-        {/* Expanded to max-w-[1920px] and added lg:flex-row to match PathPage */}
         <div className="mx-auto flex flex-col lg:flex-row gap-4 max-w-[1920px]">
           {/* ================================== */}
           {/* LEFT COLUMN: NAVIGATION            */}
