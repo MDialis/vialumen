@@ -12,12 +12,12 @@ import {
 import { cn } from "@/lib/utils";
 
 interface CommunityToolbarProps {
-  viewMode: "full" | "compact";
-  setViewMode: (mode: "full" | "compact") => void;
+  viewMode: "card" | "compact";
+  setViewMode: (mode: "card" | "compact" ) => void;
 }
 
 const TOGGLE_OPTIONS = [
-  { id: "full", label: "Full", icon: LayoutList },
+  { id: "card", label: "Card", icon: LayoutList },
   { id: "compact", label: "Compact", icon: AlignJustify },
 ] as const;
 

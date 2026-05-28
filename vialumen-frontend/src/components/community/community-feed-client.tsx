@@ -16,7 +16,7 @@ export function CommunityFeedClient({
   feedType,
   token,
 }: CommunityFeedClientProps) {
-  const [viewMode, setViewMode] = useState<"full" | "compact">("full");
+  const [viewMode, setViewMode] = useState< "card" | "compact">("card");
 
   return (
     <>

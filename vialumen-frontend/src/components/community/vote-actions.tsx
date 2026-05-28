@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronUp, ChevronDown, Loader2, MessageSquare } from "lucide-react";
 import { castPostVote } from "@/lib/api";
+import Link from "next/link";
 
 interface VoteActionsProps {
   postId: number;
@@ -61,11 +62,14 @@ export function VoteActions({ postId, initialVotes, commentsCount, token, viewMo
           </button>
         </div>
 
-        {/* Comments Button */}
-        <button className="flex items-center bg-muted/60 gap-1.5 py-1.5 px-3 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
+        {/* Comments Link */}
+        <Link 
+          href={`/community/post/${postId}#comment`}
+          className="flex items-center bg-muted/60 gap-1.5 py-1.5 px-3 rounded-full transition-colors hover:text-primary hover:bg-primary/30"
+        >
           <MessageSquare className="w-5 h-5" />
           <span className="font-bold">{commentsCount}</span>
-        </button>
+        </Link>
       </div>
     );
   }
@@ -96,11 +100,14 @@ export function VoteActions({ postId, initialVotes, commentsCount, token, viewMo
         </button>
       </div>
 
-      {/* Comments Button */}
-      <button className="flex items-center bg-muted/60 gap-1.5 py-2.5 px-4 rounded-full transition-colors hover:text-primary hover:bg-primary/30">
+      {/* Comments Link */}
+      <Link 
+        href={`/community/post/${postId}#comment`}
+        className="flex items-center bg-muted/60 gap-1.5 py-2.5 px-4 rounded-full transition-colors hover:text-primary hover:bg-primary/30"
+      >
         <MessageSquare className="w-5 h-5" />
         <span className="font-bold">{commentsCount}</span>
-      </button>
+      </Link>
     </div>
   );
 }

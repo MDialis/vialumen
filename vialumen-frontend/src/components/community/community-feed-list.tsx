@@ -7,7 +7,7 @@ import { CommunityPostFeedResponse } from "@/types";
 interface CommunityFeedListProps {
   posts: CommunityPostFeedResponse[] | null;
   feedType: string;
-  viewMode: "full" | "compact";
+  viewMode: "card" | "compact";
   token: string;
 }
 
