@@ -67,15 +67,22 @@ func main() {
 
 	// COMMUNITY CONTENT
 	mux.HandleFunc("GET /api/community", appHandler.GetCommunityPosts)
+	mux.HandleFunc("GET /api/community/{id}", appHandler.GetCommunityPostByID)
 
 	// =========================
 	// POST ROUTES
 	// =========================
+
+	// OFFICIAL CONTENT
 	mux.Handle("POST /api/subthemes", authMiddleware(http.HandlerFunc(appHandler.CreateSubtheme)))
 	mux.Handle("POST /api/subthemes/connect", authMiddleware(http.HandlerFunc(appHandler.ConnectSubthemes)))
 	mux.Handle("POST /api/admin/workspace/content/create", authMiddleware(http.HandlerFunc(appHandler.CreateOfficialVersion)))
+
+	// COMMUNITY CONTENT
 	mux.Handle("POST /api/community", authMiddleware(http.HandlerFunc(appHandler.CreateCommunityPost)))
 	mux.Handle("POST /api/community/{id}/vote", authMiddleware(http.HandlerFunc(appHandler.VoteOnPost)))
+	mux.Handle("POST /api/community/{id}/comments", authMiddleware(http.HandlerFunc(appHandler.CreateComment)))
+	mux.Handle("POST /api/community/comments/{commentId}/vote", authMiddleware(http.HandlerFunc(appHandler.VoteOnComment)))
 
 	allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
 	if allowedOrigin == "" {

@@ -75,8 +75,29 @@ type CommunityPostFeedResponse struct {
 	ContentText    string     `json:"content_text"`
 	CreatedAt      *time.Time `json:"created_at"`
 	NetVotes       int        `json:"net_votes"`
+	CommentCount   int        `json:"comment_count"`
 }
 
 type VoteRequest struct {
 	VoteValue int `json:"vote_value"` // Expects 1, -1, or 0
+}
+
+type CreateCommentRequest struct {
+	ContentText string `json:"content_text"`
+}
+
+type PostCommentResponse struct {
+	ID          int        `json:"id"`
+	PostID      int        `json:"post_id"`
+	UserID      string     `json:"user_id"`
+	Username    string     `json:"username"`
+	AuthorName  string     `json:"author_name"`
+	ContentText string     `json:"content_text"`
+	CreatedAt   *time.Time `json:"created_at"`
+	NetVotes    int        `json:"net_votes"`
+}
+
+type CommunityPostDetailResponse struct {
+	Post     CommunityPostFeedResponse `json:"post"`
+	Comments []PostCommentResponse     `json:"comments"`
 }
