@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { getHierarchyGraph } from "@/lib/api";
 
 const Graph = dynamic(
-  () => import("@/components/graph/graph"),
+  () => import("@/components/core/graph"),
   { ssr: false, loading: () => <GraphLoading /> }
 );
 

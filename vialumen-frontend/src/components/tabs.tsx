@@ -3,6 +3,7 @@
 import React, { useState, useRef, ReactElement, ReactNode } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 interface TabProps {
   title: string;
@@ -18,7 +19,7 @@ interface TabsProps {
 
 export const TabItem = ({ children }: TabProps) => {
   return (
-    <div className="h-full w-full bg-background rounded-2xl p-3">
+    <div className="h-full w-full p-2">
       {children}
     </div>
   );
@@ -30,7 +31,7 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
 
   const activeTheme = tabs[activeTabIndex].props.theme || "";
 
-  // --- Drag to Scroll Logic for Desktop ---
+  // --- Drag to Scroll ---
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -50,12 +51,12 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
     if (!isDragging || !scrollContainerRef.current) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Scroll speed multiplier
+    const walk = (x - startX) * 2;
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
 
   return (
-    <div className="flex flex-col px-2 md:px-0 md:max-w-11/12 lg:max-w-10/12 mx-auto h-[90vh]">
+    <div className="flex flex-col md:flex-row gap-6 w-full h-[80vh] min-h-[600px]">
       <div
         role="tablist"
         ref={scrollContainerRef}
@@ -64,12 +65,10 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
         className={`
-          tabs tabs-lifted gap-2 md:gap-3
-          flex flex-row flex-nowrap
-          w-full md:justify-center relative
-          pb-3 z-10
-          overflow-x-auto 
-          scroll-smooth
+          flex flex-row md:flex-col flex-nowrap
+          w-full md:w-56 shrink-0 gap-2
+          overflow-x-auto md:overflow-y-auto
+          scroll-smooth pb-2 md:pb-0 md:pr-2
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
           ${isDragging ? "cursor-grabbing" : ""}
         `}
@@ -81,23 +80,20 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
             <Button
               key={index}
               role="tab"
-              variant={isActive ? "default" : "outline"}
+              variant={isActive ? "default" : "ghost"}
               onClick={() => {
                 if (!isDragging && !tab.props.disabled) {
                   setActiveTabIndex(index);
                 }
               }}
-              className={`
-                relative tab shrink-0 whitespace-nowrap overflow-hidden text-ellipsis
-                md:flex-1 md:min-w-[150px]
-                after:absolute after:inset-x-0 after:-bottom-4 after:top-0
-                ${tab.props.disabled
-                  ? "tab-disabled cursor-not-allowed"
-                  : `${isActive
-                    ? `${activeTheme} font-bold md:-translate-y-1 hover:-translate-y-2`
-                    : `hover:-translate-y-1`}`
-                }
-              `}
+              className={cn(
+                "relative shrink-0 whitespace-nowrap overflow-hidden text-ellipsis h-11",
+                "justify-center md:justify-start transition-all duration-300",
+                tab.props.disabled && "tab-disabled cursor-not-allowed",
+                isActive 
+                  ? `${activeTheme} font-bold md:translate-x-2` 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
             >
               {tab.props.title}
             </Button>
@@ -105,16 +101,21 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
         })}
       </div>
 
+      {/* ================================== */}
+      {/* RIGHT AREA: TAB CONTENT            */}
+      {/* ================================== */}
       <Card
-        className={`
-            relative mx-auto w-full h-full flex-1
-            py-0 rounded-4xl overflow-hidden
-            border-4 border-b-12 border-primary/50
-            bg-card ${activeTheme}
-        `}
+        className={cn(
+          "relative min-w-0 w-full h-full flex-1",
+          "py-0 rounded-4xl overflow-hidden",
+          "border-4 border-b-12 border-primary/50",
+          "bg-card",
+          activeTheme
+        )}
       >
         {tabs[activeTabIndex]}
       </Card>
+
     </div>
   );
 };
