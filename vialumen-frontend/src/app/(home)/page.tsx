@@ -78,6 +78,24 @@ export default async function Home() {
           </CardFooter>
         </Card>
 
+        {/* Community Feed CTA */}
+        <Card className="relative flex flex-col h-full hover:border-primary transition-colors duration-300">
+          <CardHeader>
+            <CardTitle>Community Hub</CardTitle>
+            <CardDescription className="mt-2 text-base">
+              See what others are discussing, share your insights, and explore
+              user-generated content.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="mt-auto">
+            <Link href="/community" className="w-full">
+              <Button variant="default" className="w-full font-semibold">
+                Explore Discussions
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+
         {/* Account CTA */}
         {!isLoggedIn && (
           <Card className="relative flex flex-col h-full hover:border-primary transition-colors duration-300">
@@ -102,25 +120,7 @@ export default async function Home() {
             </CardFooter>
           </Card>
         )}
-
-        {/* Community Feed CTA */}
-        <Card className="relative flex flex-col h-full hover:border-primary transition-colors duration-300">
-          <CardHeader>
-            <CardTitle>Community Hub</CardTitle>
-            <CardDescription className="mt-2 text-base">
-              See what others are discussing, share your insights, and explore
-              user-generated content.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="mt-auto">
-            <Link href="/community" className="w-full">
-              <Button variant="default" className="w-full font-semibold">
-                Explore Discussions
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-
+        
         {/* Placeholder */}
         {isLoggedIn && (
           <Card className="relative flex flex-col h-full border-dashed border-border/60 bg-muted/30">

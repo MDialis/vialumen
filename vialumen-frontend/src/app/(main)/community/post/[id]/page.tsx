@@ -33,7 +33,7 @@ export default async function CommunityPostPage({
 
   return (
     <ThemeWrapper>
-      <div className="min-h-screen p-4 md:p-8 bg-background text-foreground transition-colors duration-300">
+      <div className="min-h-screen p-2 md:p-4 bg-background text-foreground transition-colors duration-300">
         <div className="mx-auto flex flex-col lg:flex-row gap-4 max-w-[1920px]">
           {/* ================================== */}
           {/* LEFT COLUMN: NAVIGATION            */}

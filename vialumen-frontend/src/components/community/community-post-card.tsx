@@ -175,7 +175,7 @@ export function CommunityPostCard({
   // FULL VIEW
   // ==========================================
   return (
-    <Card className="py-3">
+    <>
       <CardHeader className="flex flex-row items-start justify-between">
         <div className="w-full">
           {/* Subtheme • Username • Timestamp */}
@@ -199,19 +199,19 @@ export function CommunityPostCard({
             <span suppressHydrationWarning>{timeAgo(post.created_at)}</span>
           </div>
 
-          <CardTitle className="text-xl font-bold leading-snug tracking-tight text-foreground">
+          <CardTitle className="text-xl font-bold leading-snug tracking-tight text-foreground pt-3">
             {post.title}
           </CardTitle>
         </div>
       </CardHeader>
 
       <CardContent>
-        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed pb-3">
           {post.content_text}
         </p>
       </CardContent>
 
-      <CardFooter onClick={(e) => e.stopPropagation()}>
+      <CardFooter onClick={(e) => e.stopPropagation()} className="px-4">
         <VoteActions
           postId={post.id}
           initialVotes={post.net_votes}
@@ -220,6 +220,6 @@ export function CommunityPostCard({
           viewMode="full"
         />
       </CardFooter>
-    </Card>
+    </>
   );
 }
