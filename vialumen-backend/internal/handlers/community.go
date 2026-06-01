@@ -183,25 +183,34 @@ func (h *Handler) GetCommunityPostByID(w http.ResponseWriter, r *http.Request) {
 			FROM comment_votes
 			GROUP BY comment_id
 		),
-		comment_reply_counts AS (
-			SELECT parent_id, COUNT(id) as reply_count
+		descendants AS (
+			SELECT id as ancestor_id, id as descendant_id
 			FROM post_comments
-			WHERE parent_id IS NOT NULL
-			GROUP BY parent_id
+			WHERE post_id = $1
+			UNION ALL
+			SELECT d.ancestor_id, c.id as descendant_id
+			FROM post_comments c
+			JOIN descendants d ON c.parent_id = d.descendant_id
+			WHERE c.post_id = $1
+		),
+		total_reply_counts AS (
+			SELECT ancestor_id, COUNT(descendant_id) - 1 as reply_count
+			FROM descendants
+			GROUP BY ancestor_id
 		),
 		comment_tree AS (
 			-- Base Case: Top-level comments (parent_id IS NULL)
 			SELECT 
 				c.id, c.post_id, c.parent_id, c.user_id, u.username, u.name, c.content_text, c.created_at,
 				COALESCE(cs.net_votes, 0) AS net_votes,
-				COALESCE(crc.reply_count, 0) as reply_count,
+				COALESCE(trc.reply_count, 0) as reply_count,
 				0 AS depth,
 				-- We multiply votes by -1 so ascending array sort yields descending vote order
 				ARRAY[COALESCE(cs.net_votes, 0) * -1, c.id] AS sort_path
 			FROM post_comments c
 			LEFT JOIN "users" u ON c.user_id = u.id
 			LEFT JOIN comment_scores cs ON c.id = cs.comment_id
-			LEFT JOIN comment_reply_counts crc ON c.id = crc.parent_id
+			LEFT JOIN total_reply_counts trc ON c.id = trc.ancestor_id
 			WHERE c.post_id = $1 AND c.parent_id IS NULL
 
 			UNION ALL
@@ -210,7 +219,7 @@ func (h *Handler) GetCommunityPostByID(w http.ResponseWriter, r *http.Request) {
 			SELECT 
 				c.id, c.post_id, c.parent_id, c.user_id, u.username, u.name, c.content_text, c.created_at,
 				COALESCE(cs.net_votes, 0) AS net_votes,
-				COALESCE(crc.reply_count, 0) as reply_count,
+				COALESCE(trc.reply_count, 0) as reply_count,
 				ct.depth + 1 AS depth,
 				-- Append the current comment's score and ID to the parent's sort path
 				ct.sort_path || ARRAY[COALESCE(cs.net_votes, 0) * -1, c.id] AS sort_path
@@ -218,7 +227,7 @@ func (h *Handler) GetCommunityPostByID(w http.ResponseWriter, r *http.Request) {
 			JOIN comment_tree ct ON c.parent_id = ct.id
 			LEFT JOIN "users" u ON c.user_id = u.id
 			LEFT JOIN comment_scores cs ON c.id = cs.comment_id
-			LEFT JOIN comment_reply_counts crc ON c.id = crc.parent_id
+			LEFT JOIN total_reply_counts trc ON c.id = trc.ancestor_id
 		)
 		SELECT id, post_id, parent_id, user_id, username, name, content_text, created_at, net_votes, depth, reply_count
 		FROM comment_tree
