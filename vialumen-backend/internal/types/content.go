@@ -84,17 +84,21 @@ type VoteRequest struct {
 
 type CreateCommentRequest struct {
 	ContentText string `json:"content_text"`
+	ParentID    *int   `json:"parent_id,omitempty"`
 }
 
 type PostCommentResponse struct {
 	ID          int        `json:"id"`
 	PostID      int        `json:"post_id"`
+	ParentID    *int       `json:"parent_id"`
 	UserID      string     `json:"user_id"`
 	Username    string     `json:"username"`
 	AuthorName  string     `json:"author_name"`
 	ContentText string     `json:"content_text"`
 	CreatedAt   *time.Time `json:"created_at"`
 	NetVotes    int        `json:"net_votes"`
+	Depth       int        `json:"depth"`
+	ReplyCount  int        `json:"reply_count"`
 }
 
 type CommunityPostDetailResponse struct {

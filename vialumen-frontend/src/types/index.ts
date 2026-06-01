@@ -132,16 +132,19 @@ export interface CommunityPostFeedResponse {
 export interface PostCommentResponse {
   id: number;
   post_id: number;
+  parent_id: number | null;
   user_id: string;
   username: string;
   author_name: string;
   content_text: string;
   created_at: string;
   net_votes: number;
+  depth: number;
+  reply_count: number;
 }
 
 export interface CommunityPostDetailResponse {
-  post: CommunityPostFeedResponse; 
+  post: CommunityPostFeedResponse;
   comments: PostCommentResponse[];
 }
 
@@ -195,4 +198,5 @@ export interface VoteRequest {
 
 export interface CreateCommentRequest {
   content_text: string;
+  parent_id?: number | null;
 }

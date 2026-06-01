@@ -105,7 +105,7 @@ export async function getSubthemePathNodes(
 ): Promise<HierarchyGraphResponse | null> {
   try {
     // Append the query param if it exists
-    const url = hierarchyId 
+    const url = hierarchyId
       ? `${API}/path/${slug}?hierarchy_id=${hierarchyId}`
       : `${API}/path/${slug}`;
 
@@ -367,7 +367,7 @@ export async function castPostVote(
 ): Promise<boolean> {
   try {
     const payload: VoteRequest = { vote_value: voteValue };
-    
+
     const response = await fetch(`${API}/community/${postId}/vote`, {
       method: "POST",
       headers: {
@@ -388,9 +388,14 @@ export async function castPostVote(
   }
 }
 
-export async function postComment(postId: number, content: string, token: string): Promise<PostCommentResponse | null> {
+export async function postComment(
+  postId: number,
+  content: string,
+  token: string,
+  parentId?: number | null,
+): Promise<PostCommentResponse | null> {
   try {
-    const payload: CreateCommentRequest = { content_text: content };
+    const payload: CreateCommentRequest = { content_text: content, parent_id: parentId };
     const response = await fetch(`${API}/community/${postId}/comments`, {
       method: "POST",
       headers: {
@@ -401,8 +406,8 @@ export async function postComment(postId: number, content: string, token: string
     });
 
     if (!response.ok) return null;
-    
-    return await response.json(); 
+
+    return await response.json();
   } catch (error) {
     console.error("Network error posting comment:", error);
     return null;

@@ -22,10 +22,10 @@ export function CommentSection({ postId, comments, token }: CommentSectionProps)
 
   const handleSubmit = async () => {
     if (!content.trim() || !token) return;
-    
+
     setIsSubmitting(true);
-    const newComment = await postComment(postId, content, token);
-    
+    const newComment = await postComment(postId, content, token, null);
+
     if (newComment) {
       setContent(""); // Clear input
       router.refresh(); // Tells Next.js to re-fetch the server component seamlessly

@@ -178,14 +178,51 @@ func (h *Handler) GetCommunityPostByID(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the Comments for this Post
 	commentsQuery := `
-		SELECT c.id, c.post_id, c.user_id, u.username, u.name, c.content_text, c.created_at,
-		COALESCE(SUM(cv.vote_value), 0) AS net_votes
-		FROM post_comments c
-		LEFT JOIN "users" u ON c.user_id = u.id
-		LEFT JOIN comment_votes cv ON c.id = cv.comment_id
-		WHERE c.post_id = $1
-		GROUP BY c.id, u.username, u.name
-		ORDER BY net_votes DESC, c.created_at DESC` // Sort by highest voted, then newest
+		WITH RECURSIVE comment_scores AS (
+			SELECT comment_id, COALESCE(SUM(vote_value), 0) AS net_votes
+			FROM comment_votes
+			GROUP BY comment_id
+		),
+		comment_reply_counts AS (
+			SELECT parent_id, COUNT(id) as reply_count
+			FROM post_comments
+			WHERE parent_id IS NOT NULL
+			GROUP BY parent_id
+		),
+		comment_tree AS (
+			-- Base Case: Top-level comments (parent_id IS NULL)
+			SELECT 
+				c.id, c.post_id, c.parent_id, c.user_id, u.username, u.name, c.content_text, c.created_at,
+				COALESCE(cs.net_votes, 0) AS net_votes,
+				COALESCE(crc.reply_count, 0) as reply_count,
+				0 AS depth,
+				-- We multiply votes by -1 so ascending array sort yields descending vote order
+				ARRAY[COALESCE(cs.net_votes, 0) * -1, c.id] AS sort_path
+			FROM post_comments c
+			LEFT JOIN "users" u ON c.user_id = u.id
+			LEFT JOIN comment_scores cs ON c.id = cs.comment_id
+			LEFT JOIN comment_reply_counts crc ON c.id = crc.parent_id
+			WHERE c.post_id = $1 AND c.parent_id IS NULL
+
+			UNION ALL
+
+			-- Recursive Step: Replies to comments
+			SELECT 
+				c.id, c.post_id, c.parent_id, c.user_id, u.username, u.name, c.content_text, c.created_at,
+				COALESCE(cs.net_votes, 0) AS net_votes,
+				COALESCE(crc.reply_count, 0) as reply_count,
+				ct.depth + 1 AS depth,
+				-- Append the current comment's score and ID to the parent's sort path
+				ct.sort_path || ARRAY[COALESCE(cs.net_votes, 0) * -1, c.id] AS sort_path
+			FROM post_comments c
+			JOIN comment_tree ct ON c.parent_id = ct.id
+			LEFT JOIN "users" u ON c.user_id = u.id
+			LEFT JOIN comment_scores cs ON c.id = cs.comment_id
+			LEFT JOIN comment_reply_counts crc ON c.id = crc.parent_id
+		)
+		SELECT id, post_id, parent_id, user_id, username, name, content_text, created_at, net_votes, depth, reply_count
+		FROM comment_tree
+		ORDER BY sort_path;`
 
 	rows, err := h.DB.Query(commentsQuery, postID)
 	if err != nil {
@@ -201,7 +238,7 @@ func (h *Handler) GetCommunityPostByID(w http.ResponseWriter, r *http.Request) {
 		var cAuthor *string
 		var cUser *string
 
-		if err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &cUser, &cAuthor, &c.ContentText, &c.CreatedAt, &c.NetVotes); err != nil {
+		if err := rows.Scan(&c.ID, &c.PostID, &c.ParentID, &c.UserID, &cUser, &cAuthor, &c.ContentText, &c.CreatedAt, &c.NetVotes, &c.Depth, &c.ReplyCount); err != nil {
 			log.Printf("Error scanning comment: %v", err)
 			continue
 		}
@@ -389,9 +426,9 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
 	var commentID int
 	err := h.DB.QueryRow(`
-		INSERT INTO post_comments (post_id, user_id, content_text)
-		VALUES ($1, $2, $3) RETURNING id`,
-		postID, userID, req.ContentText,
+		INSERT INTO post_comments (post_id, user_id, content_text, parent_id)
+		VALUES ($1, $2, $3, $4) RETURNING id`,
+		postID, userID, req.ContentText, req.ParentID,
 	).Scan(&commentID)
 
 	if err != nil {
