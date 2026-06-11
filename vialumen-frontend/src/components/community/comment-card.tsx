@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PostCommentResponse } from "@/types";
-import { User, ChevronUp, ChevronDown, Loader2, MessageSquare } from "lucide-react";
+import { User, ChevronUp, ChevronDown, Loader2, MessageSquare, ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
 import { castCommentVote, postComment } from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,17 @@ function timeAgo(dateString: string) {
   return `${days}d ago`;
 }
 
-export function CommentCard({ comment, token }: { comment: PostCommentResponse; token: string }) {
+export function CommentCard({
+  comment,
+  token,
+  onToggleReplies,
+  areRepliesHidden,
+}: {
+  comment: PostCommentResponse;
+  token: string;
+  onToggleReplies?: (commentId: number) => void;
+  areRepliesHidden?: boolean;
+}) {
   const [netVotes, setNetVotes] = useState(comment.net_votes);
   const [replyCount, setReplyCount] = useState(comment.reply_count);
   const [isVoting, setIsVoting] = useState(false);
@@ -126,6 +136,21 @@ export function CommentCard({ comment, token }: { comment: PostCommentResponse; 
           <MessageSquare className="w-5 h-5" />
           <span className="font-bold">{replyCount ?? 0}</span>
         </button>
+
+        {comment.reply_count > 0 && onToggleReplies && (
+          <button
+            onClick={() => onToggleReplies(comment.id)}
+            className="flex items-center bg-muted/60 gap-1.5 py-2 px-3 rounded-full transition-colors hover:text-primary hover:bg-primary/30"
+          >
+            <ChevronsUpDown className="w-4 h-4" />
+            <span className="text-xs font-bold">
+              {areRepliesHidden
+                ? `Show ${comment.reply_count} ${comment.reply_count === 1 ? "reply" : "replies"
+                }`
+                : "Hide replies"}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Reply Form */}

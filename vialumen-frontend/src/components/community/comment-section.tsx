@@ -19,6 +19,21 @@ export function CommentSection({ postId, comments, token }: CommentSectionProps)
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const [hiddenReplies, setHiddenReplies] = useState<Set<number>>(() => {
+    return new Set(comments.filter((c) => c.reply_count > 0).map((c) => c.id));
+  });
+
+  const toggleReplies = (commentId: number) => {
+    setHiddenReplies((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
 
   const handleSubmit = async () => {
     if (!content.trim() || !token) return;
@@ -32,6 +47,24 @@ export function CommentSection({ postId, comments, token }: CommentSectionProps)
     }
     setIsSubmitting(false);
   };
+
+  const visibleComments: PostCommentResponse[] = [];
+  if (comments.length > 0) {
+    const parentStack: PostCommentResponse[] = [];
+
+    for (const comment of comments) {
+      while (parentStack.length > 0 && comment.depth <= parentStack[parentStack.length - 1].depth) {
+        parentStack.pop();
+      }
+
+      if (parentStack.some((p) => hiddenReplies.has(p.id))) {
+        continue;
+      }
+
+      visibleComments.push(comment);
+      parentStack.push(comment);
+    }
+  }
 
   return (
     <div id="comment" className="space-y-4 mt-2">
@@ -65,10 +98,16 @@ export function CommentSection({ postId, comments, token }: CommentSectionProps)
 
       {/* Comments List */}
       <div>
-        {comments.length > 0 ? (
+        {visibleComments.length > 0 ? (
           <div className="flex flex-col">
-            {comments.map((comment) => (
-              <CommentCard key={comment.id} comment={comment} token={token} />
+            {visibleComments.map((comment) => (
+              <CommentCard
+                key={comment.id}
+                comment={comment}
+                token={token}
+                onToggleReplies={toggleReplies}
+                areRepliesHidden={hiddenReplies.has(comment.id)}
+              />
             ))}
           </div>
         ) : (
