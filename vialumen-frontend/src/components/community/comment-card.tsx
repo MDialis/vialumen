@@ -28,11 +28,13 @@ export function CommentCard({
   token,
   onToggleReplies,
   areRepliesHidden,
+  isLastInThread,
 }: {
   comment: PostCommentResponse;
   token: string;
   onToggleReplies?: (commentId: number) => void;
   areRepliesHidden?: boolean;
+  isLastInThread?: boolean;
 }) {
   const [netVotes, setNetVotes] = useState(comment.net_votes);
   const [replyCount, setReplyCount] = useState(comment.reply_count);
@@ -70,6 +72,28 @@ export function CommentCard({
       className="relative flex flex-col gap-2 p-4 last:border-0 transition-colors"
       style={{ marginLeft: `${comment.depth * 2}rem` }}
     >
+      {comment.depth > 0 && (
+        <>
+          {/* Vertical thread line for the whole thread. */}
+          <div className={`absolute -left-4 w-px bg-border ${isLastInThread ? "top-0 h-[26px]" : "top-0 bottom-0"}`} />
+          {/* Curve and horizontal line, with a background to hide the vertical line. */}
+          <svg
+            width="17"
+            height="8"
+            viewBox="0 0 17 8"
+            className={`absolute -left-4 top-[18px] ${isLastInThread ? "text-background" : ""}`}
+            fill="none"
+          >
+            <rect width="17" height="8" fill={`${isLastInThread ? "currentColor" : ""}`} />
+            <path
+              d="M0.5 0 C0.5 4.41828, 4.08172 8, 8.5 8 H 17"
+              stroke="currentColor"
+              className="text-border"
+            />
+          </svg>
+        </>
+      )}
+
       {/* Author & Meta */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Link href={`/profile/${comment.username}`}>

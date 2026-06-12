@@ -100,15 +100,21 @@ export function CommentSection({ postId, comments, token }: CommentSectionProps)
       <div>
         {visibleComments.length > 0 ? (
           <div className="flex flex-col">
-            {visibleComments.map((comment) => (
-              <CommentCard
-                key={comment.id}
-                comment={comment}
-                token={token}
-                onToggleReplies={toggleReplies}
-                areRepliesHidden={hiddenReplies.has(comment.id)}
-              />
-            ))}
+            {visibleComments.map((comment, index) => {
+              const nextComment = visibleComments[index + 1];
+              // A comment is the last in its thread if the next comment is on a different level
+              const isLastInThread = !nextComment || nextComment.depth != comment.depth; return (
+
+                <CommentCard
+                  key={comment.id}
+                  comment={comment}
+                  token={token}
+                  onToggleReplies={toggleReplies}
+                  areRepliesHidden={hiddenReplies.has(comment.id)}
+                  isLastInThread={isLastInThread}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="p-8 text-center text-muted-foreground text-sm">
