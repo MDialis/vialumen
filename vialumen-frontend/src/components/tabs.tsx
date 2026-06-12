@@ -15,6 +15,7 @@ interface TabProps {
 interface TabsProps {
   children: ReactElement<TabProps> | ReactElement<TabProps>[];
   defaultIndex?: number;
+  topContent?: ReactNode;
 }
 
 export const TabItem = ({ children }: TabProps) => {
@@ -25,7 +26,7 @@ export const TabItem = ({ children }: TabProps) => {
   );
 };
 
-export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
+export const Tabs = ({ children, defaultIndex = 0, topContent }: TabsProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState(defaultIndex);
   const tabs = React.Children.toArray(children) as ReactElement<TabProps>[];
 
@@ -57,22 +58,28 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
 
   return (
     <div className="flex flex-col md:flex-row gap-6 w-full h-[80vh] min-h-[600px]">
-      <div
-        role="tablist"
-        ref={scrollContainerRef}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        className={`
-          flex flex-row md:flex-col flex-nowrap
-          w-full md:w-56 shrink-0 gap-2
-          overflow-x-auto md:overflow-y-auto
-          scroll-smooth pb-2 md:pb-0 md:pr-2
-          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
-          ${isDragging ? "cursor-grabbing" : ""}
-        `}
-      >
+      <div className="flex flex-col w-full md:w-56 shrink-0">
+        {topContent && (
+          <div className="flex-shrink-0">
+            {topContent}
+          </div>
+        )}
+        <div
+          role="tablist"
+          ref={scrollContainerRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          className={`
+            flex flex-row md:flex-col flex-nowrap
+            w-full shrink-0 gap-2
+            overflow-x-auto md:overflow-y-auto
+            scroll-smooth pb-2 md:pb-0 md:pr-2
+            [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+            ${isDragging ? "cursor-grabbing" : ""}
+          `}
+        >
         {tabs.map((tab, index) => {
           const isActive = index === activeTabIndex;
 
@@ -99,6 +106,7 @@ export const Tabs = ({ children, defaultIndex = 0 }: TabsProps) => {
             </Button>
           );
         })}
+        </div>
       </div>
 
       {/* ================================== */}

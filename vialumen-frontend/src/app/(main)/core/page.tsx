@@ -50,15 +50,17 @@ export default async function Core({ searchParams }: Props) {
         {/* ================================== */}
         {/* TABS & DATA CONTENT                */}
         {/* ================================== */}
-        <Tabs key={defaultIndex} defaultIndex={defaultIndex}>
+        <Tabs
+          key={defaultIndex}
+          defaultIndex={defaultIndex}
+          topContent={<CoreViewToggle currentView={viewMode} />}
+        >
           {levels.map((level, index) => (
             <TabItem
               key={`${level.id}-${index}`}
               title={level.title}
               theme={level.theme}
             >
-              <CoreViewToggle currentView={viewMode} />
-
               {viewMode === "map" ? (
                 <GraphDataView hierarchyId={level.id} />
               ) : (
