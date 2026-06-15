@@ -15,7 +15,7 @@ function TreeNode({
   const children = childrenMap[node.id] || [];
 
   return (
-    <div className="flex flex-col mt-2">
+    <div className="flex flex-col">
       <Link
         href={`/path/${node.slug}?theme=${activeTheme}`}
         className="group flex flex-col py-2 px-3 rounded-md hover:bg-muted/50 transition-colors"
@@ -23,14 +23,14 @@ function TreeNode({
         <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
           {node.title}
         </h4>
-        <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+        <p className="text-sm text-muted-foreground line-clamp-2">
           {node.description}
         </p>
       </Link>
 
       {/* Render children with an indented left border line */}
       {children.length > 0 && (
-        <div className="ml-4 pl-4 border-l-2 border-border/60 flex flex-col mt-1 space-y-1">
+        <div className="ml-3 pl-3 border-l-2 border-border/60 flex flex-col">
           {children.map((child) => (
             <TreeNode
               key={child.id}
@@ -78,8 +78,10 @@ export async function HierarchyListView({ hierarchyId }: { hierarchyId: string }
   const rootNodes = data.nodes.filter((n) => !isTarget.has(String(n.id)));
 
   return (
-    <div className="bg-card border border-border shadow-sm rounded-xl p-4 md:p-6 max-w-4xl">
-      <div className="flex flex-col space-y-4">
+    <div
+      className="rounded-xl h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/60 [&::-webkit-scrollbar-thumb]:rounded-full"
+    >
+      <div className="flex flex-col">
         {rootNodes.map((root) => (
           <TreeNode
             key={root.id}
