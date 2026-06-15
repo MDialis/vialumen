@@ -50,6 +50,7 @@ func main() {
 	// USER PROFILES
 	mux.HandleFunc("GET /api/profile/{username}", appHandler.GetUserProfile)
 	mux.HandleFunc("GET /api/users/search", appHandler.SearchAllUsers)
+	mux.HandleFunc("GET /api/search", appHandler.GlobalSearch)
 
 	// HIERARCHIES
 	mux.HandleFunc("GET /api/hierarchies", appHandler.GetHierarchyLevels)

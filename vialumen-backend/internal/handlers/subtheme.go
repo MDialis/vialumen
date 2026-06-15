@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -381,4 +382,130 @@ func (h *Handler) ConnectSubthemes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Subthemes connected successfully",
 	})
+}
+
+// SearchResult represents a single item in the global search results.
+type SearchResult struct {
+	Type         string  `json:"type"` // "official" or "community"
+	Title        string  `json:"title"`
+	URL          string  `json:"url"`
+	Snippet      *string `json:"snippet,omitempty"`
+	SubthemeName *string `json:"subtheme_name,omitempty"`
+}
+
+// ----- SEARCH Functions -----
+func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if len(query) < 2 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("[]"))
+		return
+	}
+
+	searchPattern := "%" + query + "%"
+
+	// Fetch official content (subthemes)
+	officialQuery := `
+		SELECT id, title, slug, LEFT(description, 200) as snippet
+		FROM subthemes
+		WHERE title ILIKE $1 OR description ILIKE $1
+		ORDER BY title ASC
+		LIMIT 10
+	`
+	officialRows, err := h.DB.Query(officialQuery, searchPattern)
+	if err != nil {
+		log.Printf("Error searching official content: %v", err)
+		http.Error(w, "Search failed", http.StatusInternalServerError)
+		return
+	}
+	defer officialRows.Close()
+
+	officialResults := []SearchResult{}
+	for officialRows.Next() {
+		var id int
+		var title, slug, snippet string
+		if err := officialRows.Scan(&id, &title, &slug, &snippet); err != nil {
+			log.Printf("Error scanning official search result: %v", err)
+			continue
+		}
+		snippetStr := snippet
+		officialResults = append(officialResults, SearchResult{
+			Type:    "official",
+			Title:   title,
+			URL:     fmt.Sprintf("/path/%s", slug),
+			Snippet: &snippetStr,
+		})
+	}
+
+	// Fetch community content (posts)
+	communityQuery := `
+		SELECT cp.id, cp.title, LEFT(cp.content_text, 200) as snippet, s.title as subtheme_title,
+			   COALESCE(SUM(v.vote_value), 0) AS net_votes
+		FROM community_posts cp
+		JOIN subthemes s ON cp.subtheme_id = s.id
+		LEFT JOIN community_post_votes v ON cp.id = v.post_id
+		WHERE (cp.title ILIKE $1 OR cp.content_text ILIKE $1) AND cp.status = 'published'
+		GROUP BY cp.id, s.title
+		ORDER BY net_votes DESC, cp.created_at DESC
+		LIMIT 10
+	`
+	communityRows, err := h.DB.Query(communityQuery, searchPattern)
+	if err != nil {
+		log.Printf("Error searching community content: %v", err)
+		http.Error(w, "Search failed", http.StatusInternalServerError)
+		return
+	}
+	defer communityRows.Close()
+
+	communityResults := []SearchResult{}
+	for communityRows.Next() {
+		var id, netVotes int
+		var title, snippet, subthemeTitle string
+		if err := communityRows.Scan(&id, &title, &snippet, &subthemeTitle, &netVotes); err != nil {
+			log.Printf("Error scanning community search result: %v", err)
+			continue
+		}
+		snippetStr := snippet
+		subthemeTitleStr := subthemeTitle
+		communityResults = append(communityResults, SearchResult{
+			Type:         "community",
+			Title:        title,
+			URL:          fmt.Sprintf("/community/posts/%d", id),
+			Snippet:      &snippetStr,
+			SubthemeName: &subthemeTitleStr,
+		})
+	}
+
+	// Combine results
+	var finalResults []SearchResult
+	numOfficial := len(officialResults)
+	numCommunity := len(communityResults)
+
+	officialTarget := 3
+	communityTarget := 7
+
+	if numOfficial < 3 {
+		officialTarget = numOfficial
+		communityTarget = 10 - officialTarget
+	} else if numCommunity < 7 {
+		communityTarget = numCommunity
+		officialTarget = 10 - communityTarget
+	}
+
+	if len(officialResults) > officialTarget {
+		finalResults = append(finalResults, officialResults[:officialTarget]...)
+	} else {
+		finalResults = append(finalResults, officialResults...)
+	}
+
+	if len(communityResults) > communityTarget {
+		finalResults = append(finalResults, communityResults[:communityTarget]...)
+	} else {
+		finalResults = append(finalResults, communityResults...)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(finalResults)
 }
