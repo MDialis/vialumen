@@ -396,7 +396,7 @@ type SearchResult struct {
 // ----- SEARCH Functions -----
 func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
-	if len(query) < 2 {
+	if len(query) < 3 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("[]"))
@@ -503,6 +503,11 @@ func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 		finalResults = append(finalResults, communityResults[:communityTarget]...)
 	} else {
 		finalResults = append(finalResults, communityResults...)
+	}
+
+	// Ensure we always return a JSON array, not null, if there are no results.
+	if finalResults == nil {
+		finalResults = []SearchResult{}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

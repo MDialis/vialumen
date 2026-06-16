@@ -2,17 +2,12 @@
 
 import { useState } from "react";
 import { Fredoka } from "next/font/google";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "./ui/input-group";
 import Link from "next/link";
 import UserButton from "./user-button";
 import { LayoutDashboard, PlusCircle, Search, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
+import GlobalSearch from "./global-search";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -40,14 +35,7 @@ export default function Navbar({ transparent = false }: NavbarProps) {
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
         {isSearchOpen && !transparent ? (
           <>
-            <InputGroup className="bg-muted text-muted-foreground w-full">
-              <InputGroupInput placeholder="Type to search..." autoFocus />
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" className="bg-background">
-                  Search
-                </InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
+            <GlobalSearch autoFocus onResultClick={() => setIsSearchOpen(false)} />
             <Button
               variant="ghost"
               size="icon"
@@ -73,14 +61,7 @@ export default function Navbar({ transparent = false }: NavbarProps) {
             </div>
 
             <div className={`max-w-sm w-full ${transparent ? "hidden" : "hidden md:flex"}`}>
-              <InputGroup className="bg-muted text-muted-foreground">
-                <InputGroupInput placeholder="Type to search..." />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton variant="ghost" className="bg-background">
-                    Search
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
+              <GlobalSearch />
             </div>
 
             <div className="flex-1 flex justify-end items-center gap-1 md:gap-4">

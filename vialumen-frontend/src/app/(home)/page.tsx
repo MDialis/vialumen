@@ -11,15 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
 
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import GlobalSearch from "@/components/global-search";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -49,14 +44,7 @@ export default async function Home() {
         </div>
 
         <div className="w-full">
-          <InputGroup className="bg-card">
-            <InputGroupInput placeholder="Type to search..." />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton variant="ghost" className="bg-background">
-                Search
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <GlobalSearch />
         </div>
       </div>
 
@@ -120,7 +108,7 @@ export default async function Home() {
             </CardFooter>
           </Card>
         )}
-        
+
         {/* Placeholder */}
         {isLoggedIn && (
           <Card className="relative flex flex-col h-full border-dashed border-border/60 bg-muted/30">

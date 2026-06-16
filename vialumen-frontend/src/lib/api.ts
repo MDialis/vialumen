@@ -18,6 +18,14 @@ import {
 
 const API = process.env.NEXT_PUBLIC_API;
 
+export interface GlobalSearchResult {
+  type: "official" | "community";
+  title: string;
+  url: string;
+  snippet?: string;
+  subtheme_name?: string;
+}
+
 export interface GetCommunityPostsOptions {
   feed?: "home" | "trending";
   subtheme_id?: number;
@@ -222,6 +230,24 @@ export async function searchUsers(query: string): Promise<UserSearchResult[]> {
     return await response.json();
   } catch (error) {
     console.error("User search failed:", error);
+    return [];
+  }
+}
+
+export async function globalSearch(query: string): Promise<GlobalSearchResult[]> {
+  if (!query.trim() || query.trim().length < 3) return [];
+  try {
+    const response = await fetch(
+      `${API}/search?q=${encodeURIComponent(query)}`,
+      { cache: "no-store" },
+    );
+    if (!response.ok) {
+      console.error(`Global search failed: ${response.statusText}`);
+      return [];
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Global search failed:", error);
     return [];
   }
 }
