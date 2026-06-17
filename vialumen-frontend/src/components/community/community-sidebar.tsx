@@ -35,20 +35,17 @@ export function CommunitySidebar({ feedType }: { feedType: string }) {
               <Button
                 key={feed.id}
                 asChild
-                variant="ghost"
+                variant="default"
                 className={cn(
-                  "w-full justify-start h-10 rounded-xl transition-colors duration-200",
+                  "w-full justify-start h-10 rounded-xl border-0 active:border-b-0 transition duration-200",
                   isActive
-                    ? "font-bold bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
-                    : "font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+                    ? "font-bold bg-primary text-primary-foreground hover:brightness-130"
+                    : "font-medium bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 <Link href={feed.href}>
                   <Icon
-                    className={cn(
-                      "w-5 h-5 mr-3 transition-colors",
-                      isActive ? "text-primary" : "text-muted-foreground",
-                    )}
+                    className="w-5 h-5 mr-3"
                   />
                   {feed.label}
                 </Link>
