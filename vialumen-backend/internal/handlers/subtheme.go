@@ -407,13 +407,21 @@ func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch official content (subthemes)
 	officialQuery := `
-		SELECT id, title, slug, LEFT(description, 200) as snippet
+		SELECT id, title, slug, LEFT(description, 200) as snippet,
+		       GREATEST(
+			       similarity(title, $1),
+			       similarity(description, $1),
+			       CASE WHEN title ILIKE $2 OR description ILIKE $2 THEN 0.15 ELSE 0 END
+		       ) as relevance
 		FROM subthemes
-		WHERE title ILIKE $1 OR description ILIKE $1
-		ORDER BY title ASC
+		WHERE
+			GREATEST(similarity(title, $1), similarity(description, $1)) > 0.2
+			OR title ILIKE $2
+			OR description ILIKE $2
+		ORDER BY relevance DESC, title ASC
 		LIMIT 10
 	`
-	officialRows, err := h.DB.Query(officialQuery, searchPattern)
+	officialRows, err := h.DB.Query(officialQuery, query, searchPattern)
 	if err != nil {
 		log.Printf("Error searching official content: %v", err)
 		http.Error(w, "Search failed", http.StatusInternalServerError)
@@ -425,7 +433,8 @@ func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 	for officialRows.Next() {
 		var id int
 		var title, slug, snippet string
-		if err := officialRows.Scan(&id, &title, &slug, &snippet); err != nil {
+		var relevance float64
+		if err := officialRows.Scan(&id, &title, &slug, &snippet, &relevance); err != nil {
 			log.Printf("Error scanning official search result: %v", err)
 			continue
 		}
@@ -441,16 +450,24 @@ func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 	// Fetch community content (posts)
 	communityQuery := `
 		SELECT cp.id, cp.title, LEFT(cp.content_text, 200) as snippet, s.title as subtheme_title,
-			   COALESCE(SUM(v.vote_value), 0) AS net_votes
+			COALESCE(SUM(v.vote_value), 0) AS net_votes,
+			GREATEST(
+				similarity(cp.title, $1),
+				similarity(cp.content_text, $1),
+				CASE WHEN cp.title ILIKE $2 OR cp.content_text ILIKE $2 THEN 0.15 ELSE 0 END
+			) as relevance
 		FROM community_posts cp
 		JOIN subthemes s ON cp.subtheme_id = s.id
 		LEFT JOIN community_post_votes v ON cp.id = v.post_id
-		WHERE (cp.title ILIKE $1 OR cp.content_text ILIKE $1) AND cp.status = 'published'
+		WHERE ((GREATEST(similarity(cp.title, $1), similarity(cp.content_text, $1)) > 0.2)
+			OR cp.title ILIKE $2
+			OR cp.content_text ILIKE $2
+		) AND cp.status = 'published'
 		GROUP BY cp.id, s.title
-		ORDER BY net_votes DESC, cp.created_at DESC
+		ORDER BY relevance DESC, net_votes DESC, cp.created_at DESC
 		LIMIT 10
 	`
-	communityRows, err := h.DB.Query(communityQuery, searchPattern)
+	communityRows, err := h.DB.Query(communityQuery, query, searchPattern)
 	if err != nil {
 		log.Printf("Error searching community content: %v", err)
 		http.Error(w, "Search failed", http.StatusInternalServerError)
@@ -462,7 +479,8 @@ func (h *Handler) GlobalSearch(w http.ResponseWriter, r *http.Request) {
 	for communityRows.Next() {
 		var id, netVotes int
 		var title, snippet, subthemeTitle string
-		if err := communityRows.Scan(&id, &title, &snippet, &subthemeTitle, &netVotes); err != nil {
+		var relevance float64
+		if err := communityRows.Scan(&id, &title, &snippet, &subthemeTitle, &netVotes, &relevance); err != nil {
 			log.Printf("Error scanning community search result: %v", err)
 			continue
 		}
